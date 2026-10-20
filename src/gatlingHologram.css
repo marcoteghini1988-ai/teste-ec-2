@@ -1,0 +1,71 @@
+/* Origine della proiezione: bordo della carta. Player cresce in alto, nemico in basso. */
+.gatling-holo-host {
+  position: fixed;
+  z-index: 2147482000;
+  pointer-events: none;
+  isolation: isolate;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 10px var(--holo));
+  animation: gatlingEmerge 530ms cubic-bezier(.2,.8,.15,1) both;
+}
+.gatling-holo-host.enemy { transform-origin: 50% 0%; }
+.gatling-holo-host.retracting { animation: gatlingRetract 370ms ease-in forwards; }
+.gatling-holo-canvas { position: absolute; inset: 0; display: block; z-index: 3; pointer-events: none; }
+.gatling-holo-platform {
+  position: absolute;
+  bottom: 0;
+  left: 18%; right: 18%; height: 13%;
+  border: 2px solid var(--holo);
+  border-radius: 50%;
+  box-shadow: 0 0 18px var(--holo), inset 0 0 10px var(--holo);
+  animation: gatlingPulse .4s ease-in-out infinite alternate;
+}
+.gatling-holo-host.enemy .gatling-holo-platform { bottom: auto; top: -3%; }
+.gatling-holo-scans {
+  position: absolute; z-index: 4; inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0px, transparent 7px, rgba(86,233,255,.14) 8px, transparent 9px);
+  mix-blend-mode: screen;
+  animation: gatlingScan 1s linear infinite;
+  opacity: .55;
+}
+.gatling-holo-caption {
+  position: absolute; z-index: 5;
+  left: 0; right: 0; bottom: -12px;
+  text-align: center; color: var(--holo);
+  font: 900 9px/1.2 monospace; letter-spacing: 1.2px;
+  text-shadow: 0 0 9px var(--holo);
+}
+.gatling-holo-host.enemy .gatling-holo-caption { bottom: auto; top: -16px; }
+.gatling-holo-source {
+  outline: 1px solid #d5faff;
+  animation: gatlingPulse .35s ease-in-out infinite alternate;
+}
+.gatling-holo-source-player { box-shadow: 0 0 20px 5px #4fe8ff !important; }
+.gatling-holo-source-enemy { box-shadow: 0 0 20px 5px #ff648d !important; outline-color: #ffbfd0; }
+.gatling-holo-bullet {
+  position: fixed; z-index: 2147482002; pointer-events: none;
+  width: 26px; height: 4px; border-radius: 99px;
+  background: #fff;
+  box-shadow: 0 0 8px 3px var(--shot), 0 0 18px 6px var(--shot);
+  transform-origin: left center;
+}
+.gatling-holo-fallback-art {
+  position: absolute; z-index: 3;
+  top: 3%; left: 3%; width: 94%; height: 94%;
+  object-fit: contain;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 13px var(--holo));
+}
+.gatling-holo-host.enemy .gatling-holo-fallback-art { transform: rotate(90deg); }
+@keyframes gatlingEmerge {
+  0% { opacity: 0; transform: scale(.04,.025) perspective(600px) rotateX(48deg); }
+  35% { opacity: .80; transform: scale(.48,.5) perspective(600px) rotateX(18deg); }
+  75% { opacity: 1; transform: scale(1.06,1.04) perspective(600px) rotateX(0deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes gatlingRetract {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.04,.025) perspective(600px) rotateX(48deg); }
+}
+@keyframes gatlingPulse { from { opacity: .4; } to { opacity: .9; } }
+@keyframes gatlingScan { to { background-position: 0 18px; } }
