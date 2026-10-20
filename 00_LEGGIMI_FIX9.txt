@@ -1,0 +1,35 @@
+ECLISSI STELLARE — FIX 9: PORTALI VERTICALI SULLA CARTA REALE
+
+PACCHETTO MINIMO: SOLO 3 FILE DI CODICE
+
+DOVE COPIARLI (importante):
+- src/newCombat/PokerCombatEffects.jsx
+- src/newCombat/pokerCombatEffects.css
+- src/newCombat/pokerVolleyVfx.js
+
+In StackBlitz aprire la directory src, poi newCombat: non usare le vecchie
+copie omonime nella cartella principale del repository.
+
+PROBLEMA RISCONTRATO NELLO ZIP 2026-10-19:
+- I tre file dentro src/newCombat contenevano ancora il vecchio effetto orizzontale.
+- Le copie in cima al repository contenevano le porte FIX 7, ma non erano quelle importate dal gioco.
+
+CORREZIONI
+- porta verticale, con cornice prospettica e profondità, ancorata allo slot esatto;
+- la posizione segue getBoundingClientRect() durante la salva;
+- colpo che parte dal centro dell'apertura e arriva all'HUD HP bersaglio;
+- firma visiva dipendente dai 48 effetti arma (famiglie condivise);
+- il codice dei turni, della mano, dei danni e del Boost resta invariato.
+
+VERIFICHE
+- 48 armi x due lati: 96 controlli di ancoraggio superati;
+- parsing sintassi JSX con TypeScript: 0 errori;
+- prova grafica isolata in Chromium: portali 80x148px, centrati su due carte;
+- 35/36 test combattimento superati. Un test legacy chiede 25 secondi,
+  ma il progetto attuale usa correttamente 20 secondi.
+
+LIMITAZIONE
+La prova Chromium e' una simulazione grafica isolata; NON equivale a un
+collaudo reale della modalita' Avventura in StackBlitz.
+Lo ZIP di origine non contiene tutte le immagini in public/assets/weapons;
+non sovrascrivere il progetto completo se nel tuo StackBlitz le immagini sono presenti.

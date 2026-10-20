@@ -1,0 +1,17 @@
+ECLISSI STELLARE - FILE 2 ORIGINALE + INTERFACCIA CLASSIC DEL FILE 1
+
+BASE: test-1-main.zip (FILE 2) — motore, PvP, IA, progressione, bilanciamenti, server, risorse.
+SOSTITUZIONE VISIVA: src/ClassicBattleView.jsx è derivato dal FILE 1 20-main.zip.
+Il CSS 3D originale è identico byte per byte.
+
+La conversione utilizza solo:
+  src/ClassicBattleView.jsx (DOM/stili 3D originali con agganci al nuovo motore)
+  src/ClassicPokerFieldBridge.jsx (dati e callback, senza nuovo campo)
+  src/newCombat/classicNativeBridge.css (solo involucro e pannello avanzato)
+  src/NewCombatPhase3Preview.jsx (gioco IA / Campagna: monta il bridge)
+  src/PvpOnlinePokerBattle.jsx (PvP online: monta il bridge)
+
+I file src/ClassicPokerArena.jsx e src/classicPokerArena.css del vecchio campo sostitutivo non vengono utilizzati.
+Tutte le restanti meccaniche sono quelle del FILE 2, non sono state copiate dal FILE 1.
+
+LIMITI: test end-to-end grafico e partita online reale richiedono avvio locale o StackBlitz e backend.

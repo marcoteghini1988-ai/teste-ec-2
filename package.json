@@ -1,7 +1,31 @@
 {
-  "name":"eclissi-elite-settlement-admin",
-  "private":true,
-  "type":"module",
-  "dependencies":{"firebase-admin":"^13.0.0"},
-  "scripts":{"settle":"node settleEliteWeek.mjs","poker:worker":"node pokerWorker.mjs","poker:create":"node createPokerRoom.mjs"}
+  "name": "vite-react-typescript-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test:combat": "node --test src/newCombat/*.test.js",
+    "verify:logic": "node --test src/*.test.js src/newCombat/*.test.js server/*.test.mjs",
+    "preflight": "node scripts/check-structure.mjs",
+    "check:structure": "node scripts/check-structure.mjs",
+    "cleanup:shadows": "node scripts/cleanup-legacy-shadows.mjs --apply",
+    "cleanup:r2": "node scripts/cleanup-r2-legacy.mjs --apply"
+  },
+  "dependencies": {
+    "firebase": "^12.19.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  }
 }
