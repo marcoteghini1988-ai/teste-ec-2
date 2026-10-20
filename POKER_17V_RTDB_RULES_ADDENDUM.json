@@ -1,0 +1,22 @@
+{
+  "pokerAuthority": {".read": false, ".write": false},
+  "serverProfiles": {".read": false, ".write": false},
+  "serverWallets": {".read": false, ".write": false},
+  "eliteVerifiedWeeks": {".read": false, ".write": false},
+  "eliteWeekSettlements": {".read": false, ".write": false},
+  "elitePublishedRooms": {".read": false, ".write": false},
+  "elitePublicWeeks": {"$week": {".read": "auth != null", ".write": false}},
+  "pokerRoomAssigned": {"$uid": {".read": "auth != null && auth.uid === $uid", ".write": false}},
+  "pokerViews": {"$uid": {".read": "auth != null && auth.uid === $uid", ".write": false}},
+  "pokerActionResults": {"$uid": {".read": "auth != null && auth.uid === $uid", ".write": false}},
+  "pokerWaitQueue": {"$channel": {"$uid": {
+    ".read": "auth != null && auth.uid === $uid",
+    ".write": "auth != null && auth.uid === $uid && ($channel === 'training' || $channel === 'elite') && (!data.exists() || data.child('status').val() === 'waiting')",
+    ".validate": "!newData.exists() || (newData.child('uid').val() === auth.uid && newData.child('status').val() === 'waiting' && newData.child('joinedAt').isNumber() && newData.child('joinedAt').val() >= now - 30000 && newData.child('joinedAt').val() <= now + 10000)"
+  }}},
+  "pokerIntents": {"$roomId": {"$uid": {"$actionId": {
+    ".read": false,
+    ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.exists() && $actionId.matches(/^act_[0-9]+_[a-z0-9]{5,15}$/)",
+    ".validate": "newData.hasChildren(['type','expectedVersion']) && newData.child('expectedVersion').isNumber() && newData.child('type').isString()"
+  }}}}
+}
