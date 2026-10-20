@@ -1,0 +1,90 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createPhase3Duel,commitPhase3Move,finishPhase3Animation,markPhase3Ready,exchangePhase3Cards,extractPhase3WithEther,getPhase3CandidateMove,getPhase3Time } from './phase3Engine.js';
+import { TURN_PHASES } from './config.js';
+const c=(n,s,i)=>({id:`${i||s+n}`,suit:s,value:n});
+const firstHand=[c(7,'hearts'),c(7,'clubs'),c(2,'spades'),c(9,'spades'),c(10,'hearts'),c(11,'clubs'),c(12,'clubs')];
+const enemyHand=[c(8,'hearts','e8h'),c(8,'clubs','e8c'),c(3,'spades','e3s'),c(4,'diamonds','e4d'),c(5,'hearts','e5h'),c(6,'clubs','e6c'),c(2,'hearts','e2h')];
+const initialize=(opts={})=>createPhase3Duel({playerHand:firstHand,enemyHand, ...opts});
+const four=(hand)=>hand.slice(0,4).map((card,slot)=>({card,slot}));
+test('Attacco 25, risposta 25, preparazione simultanea 35; animazioni senza timer',()=>{
+  assert.equal(getPhase3Time('attack'),25);
+  assert.equal(getPhase3Time('response'),25);
+  assert.equal(getPhase3Time('prepare'),35);
+  assert.equal(getPhase3Time('animate'),null);
+});
+test('Banco iniziale: quattro carte obbligatorie; attacco in anticipo e risposta',()=>{
+  let g=initialize();
+  assert.throws(()=>commitPhase3Move(g,'player',four(firstHand).slice(0,3)),/must_fill_empty_slots/);
+  g=commitPhase3Move(g,'player',four(firstHand));
+  assert.equal(g.phase,TURN_PHASES.RESPONSE);
+  assert.equal(g.actor,'enemy');
+  assert.equal(g.moves.player.score.patternId,'one_pair');
+  assert.equal(g.board.length,5);
+  assert.equal(g.player.hand.length,3);
+  const suggested=getPhase3CandidateMove(g,'enemy',150);
+  assert.ok(suggested, 'AI deve trovare una coppia con 7 carte');
+  g=commitPhase3Move(g,'enemy',suggested.placements);
+  assert.equal(g.phase,TURN_PHASES.ANIMATE);
+  assert.ok(g.result);
+  assert.ok(g.result.damagePercent.includes(100));
+  assert.ok(g.result.damagePercent.includes(50));
+  g=finishPhase3Animation(g);
+  assert.equal(g.phase,TURN_PHASES.PREPARE);
+  g=markPhase3Ready(g,'enemy');
+  assert.equal(g.phase,TURN_PHASES.PREPARE);
+  g=markPhase3Ready(g,'player');
+  assert.equal(g.phase,TURN_PHASES.ATTACK);
+  assert.equal(g.round,2);
+  assert.equal(g.actor,g.opener);
+});
+test('Non confermare entro il timer = passaggio; avversario senza risposta',()=>{
+  let g=initialize();
+  g=commitPhase3Move(g,'player',[],true);
+  assert.equal(g.phase,TURN_PHASES.RESPONSE);
+  assert.equal(g.moves.player.passed,true);
+  g=commitPhase3Move(g,'enemy',four(enemyHand));
+  assert.equal(g.phase,TURN_PHASES.ANIMATE);
+  assert.deepEqual(g.result.damagePercent,[0,100]);
+  assert.equal(g.result.nextOpener,'enemy');
+});
+test('Doppio passaggio: nessuno spara, iniziativa alternata',()=>{
+  let g=initialize();g=commitPhase3Move(g,'player',[],true);g=commitPhase3Move(g,'enemy',[],true);
+  assert.deepEqual(g.result.damagePercent,[0,0]);assert.equal(g.result.nextOpener,'enemy');
+});
+test('Parità Poker: entrambi 50%, iniziativa alternata provvisoria',()=>{
+  let g=initialize({enemyHand:[c(7,'spades','e7s'),c(7,'diamonds','e7d'),...enemyHand.slice(2)]});
+  g=commitPhase3Move(g,'player',four(firstHand));
+  g=commitPhase3Move(g,'enemy', [0,1,4,2].map((slot,i)=>({slot,card:g.enemy.hand[i]})));
+  assert.deepEqual(g.result.damagePercent,[50,50]);assert.equal(g.result.winner,null);
+});
+test('Preparazione: due cambi, 1–3 carte, nessun cambio dopo PRONTO',()=>{
+  let g=initialize({playerDeck:[c(1,'hearts','pd1'),c(3,'hearts','pd2'),c(4,'hearts','pd3')]});
+  g=commitPhase3Move(g,'player',[],true);g=commitPhase3Move(g,'enemy',[],true);g=finishPhase3Animation(g);
+  const n=g.player.hand.length;
+  g=exchangePhase3Cards(g,'player',[0,1,2]);
+  assert.equal(g.player.hand.length,n);
+  assert.equal(g.player.exchangesLeft,1);
+  g=exchangePhase3Cards(g,'player',[0]);
+  assert.equal(g.player.exchangesLeft,0);
+  assert.throws(()=>exchangePhase3Cards(g,'player',[1]),/massimo 2/);
+  assert.throws(()=>exchangePhase3Cards(g,'player',[1,1]),/massimo 2/);
+  g=markPhase3Ready(g,'player');
+  assert.throws(()=>exchangePhase3Cards(g,'player',[0]),/preparazione/);
+});
+test('Preparazione: Etere costa 4, sostituisce dalla riserva e conserva resto',()=>{
+  let g=initialize({ether:7,playerDeck:[c(1,'hearts','pd1'),c(3,'hearts','pd2')]});
+  g=commitPhase3Move(g,'player',[],true);g=commitPhase3Move(g,'enemy',[],true);g=finishPhase3Animation(g);
+  g=extractPhase3WithEther(g,'player',1,0,4);
+  assert.equal(g.player.ether,3);
+  assert.equal(g.player.hand[1].value,1);
+  assert.equal(g.player.deck.length,1);
+  assert.throws(()=>extractPhase3WithEther(g,'player',1,0,4),/insufficiente/);
+});
+test('Scegliere una mossa AI non altera il banco finché non si conferma',()=>{
+  const g=initialize();const snap=JSON.stringify(g);
+  const move=getPhase3CandidateMove(g,'player',40);
+  assert.ok(move);
+  assert.equal(JSON.stringify(g),snap);
+  assert.ok(move.placements.length<=4);
+});

@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {ARSENAL_48} from './weaponCatalog.js';
+import {createPhase7Armory} from './phase7Armory.js';
+import {f17jRecommendOwned,f17jWeaponCatalogAudit,f17jWeaponScore} from './tacticalAnalysis.js';
+const rates=Object.fromEntries(ARSENAL_48.map(w=>[w.id,w.allowedPokerPatterns.includes('one_pair')?85:10]));
+test('F17J audit 48 IDs unici e prezzi reali',()=>{const rows=f17jWeaponCatalogAudit(rates);assert.equal(rows.length,48);assert.equal(new Set(rows.map(x=>x.id)).size,48);assert.ok(rows.every(x=>x.price>0&&x.level4DamagePotential>x.level1DamagePotential));});
+test('F17J consigli non inventano acquisti ne livelli',()=>{const inventory=createPhase7Armory();const input={armory:inventory,pilotLevel:42,epics:[]};const before=structuredClone(input);const suggestion=f17jRecommendOwned(input,rates);assert.deepEqual(input,before);assert.deepEqual(suggestion.gear.armory.owned,inventory.owned);assert.deepEqual(suggestion.gear.armory.levels,inventory.levels);assert.equal(suggestion.changes.length,0);});
+test('F17J sceglie fra armi gia comprate a parita classe',()=>{const inventory=createPhase7Armory();inventory.owned.es_common_light_02=true;inventory.levels.es_common_light_02=4;const input={armory:inventory};const result=f17jRecommendOwned(input,rates);assert.equal(result.gear.armory.equipped.light,'es_common_light_02');assert.equal(result.changes[0].to,'es_common_light_02');assert.deepEqual(result.gear.armory.owned,inventory.owned);});
+test('F17J rifiuta inventario incoerente e non stima armi sconosciute',()=>{assert.equal(f17jWeaponScore('inventato',4,rates),0);assert.throws(()=>f17jRecommendOwned({armory:{owned:{},equipped:{light:'inventato'}}},rates));});

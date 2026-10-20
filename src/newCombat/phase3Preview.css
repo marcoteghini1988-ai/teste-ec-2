@@ -1,0 +1,69 @@
+.phase3-backdrop{position:fixed;inset:0;z-index:95000;background:rgba(1,5,18,.97);color:#e3f4ff;overflow-y:auto;font-family:system-ui,Arial,sans-serif;padding:12px;box-sizing:border-box}
+.phase3-panel{max-width:920px;margin:0 auto;padding:12px 10px 40px;background:linear-gradient(160deg,#0b1930,#030713);border:1px solid #28587b;border-radius:16px;box-shadow:0 0 28px #029be333}
+.phase3-header,.phase3-status,.phase3-moves,.phase3-board-head,.phase3-hand-heading,.phase3-prepare-resources{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.phase3-header{border-bottom:1px solid #1d4d73;padding:4px 4px 12px}.phase3-header b{font-size:1rem;color:#82e3ff}.phase3-header span{display:block;font-size:.59rem;letter-spacing:1px;color:#94c1dc;margin-top:3px}
+.phase3-panel button{cursor:pointer}.phase3-panel button:disabled{opacity:.42;cursor:default}.phase3-close,.phase3-actions button,.phase3-ether button{border:1px solid #27617d;border-radius:9px;color:#b5efff;background:#0d2a45;padding:10px 12px;font-weight:800;font-size:.73rem}.phase3-close{background:#301320;border-color:#ba4769}
+.phase3-status{margin:12px 0;background:#061222;padding:12px;border:1px solid #214766;border-radius:12px}.phase3-status>div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:65px}.phase3-status small{font-size:.6rem;letter-spacing:.8px;color:#9fc2d5}.phase3-status strong{font-size:1.3rem;color:#fff}.phase3-status .phase3-phase strong{color:#6fe4ff}.phase3-status span{font-size:.66rem;color:#a7b7c9}.phase3-clock.critical strong{color:#ff7676}
+.phase3-moves{font-size:.72rem;flex-wrap:wrap;color:#a7bdd5;gap:6px}.phase3-moves b{color:#f2f8ff}.phase3-outcome{margin-top:9px;background:#173248;border:1px solid #2b9cc7;padding:12px;border-radius:9px;font-size:.85rem;text-align:center;font-weight:800}
+.phase3-board-head,.phase3-hand-heading{margin:18px 2px 7px;font-size:.76rem}.phase3-board-head span,.phase3-hand-heading span{font-size:.62rem;color:#8eafc2;font-weight:normal;text-align:right}.phase3-board,.phase3-hand{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;padding:9px 5px;background:#05101e;border-radius:12px;border:1px solid #142f48;min-height:110px;align-items:center}
+.phase3-card{box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;width:63px;height:87px;border-radius:9px;border:2px solid #5285a1;background:linear-gradient(145deg,#ecf5ff,#b1d4e9);color:#12192a;box-shadow:0 4px 8px #0008;font-weight:900;transition:transform .12s,border-color .12s}.phase3-card span{font-size:1.25rem}.phase3-card strong{font-size:1.45rem}.phase3-card .red{color:#b42c44}.phase3-card.selected{border-color:#f6d66b;box-shadow:0 0 0 2px #f6d66b55,0 0 20px #f0c34a66;transform:translateY(-4px)}.phase3-card.empty{background:#0b1f35;border-style:dashed;border-color:#3a6380;color:#7bafc9}.phase3-card .empty-label{font-size:.75rem}.phase3-card.mini{width:53px;height:75px}.phase3-instructions{text-align:center;color:#90d4f5;font-size:.73rem;padding:8px}.phase3-message{margin:8px 0;padding:8px;color:#ffc7c7;background:#41192c;border-radius:8px;font-size:.74rem}.phase3-actions{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:12px 0}.phase3-actions button.primary{background:linear-gradient(135deg,#076782,#14a4aa);color:white;border-color:#72f5e5}.phase3-prepare-title{text-align:center;color:#78e5ff;background:#112c43;border-radius:8px;padding:8px;margin-top:15px;font-size:.72rem}.phase3-prepare-resources{font-size:.72rem;color:#a7d5e5;flex-wrap:wrap}.phase3-prep-actions{padding:8px;border:1px solid #1d5167;border-radius:9px}.phase3-ether{padding:12px;background:#071323;border:1px solid #4259a1;border-radius:9px;font-size:.72rem}.phase3-ether>div{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.phase3-footnote{line-height:1.45;margin:15px 2px;font-size:.66rem;color:#88a4b8}.phase3-log{color:#96b9ce;font-size:.72rem;padding:8px}.phase3-log div{padding:3px 0;border-bottom:1px solid #20324a}
+@media(max-width:520px){.phase3-backdrop{padding:2px}.phase3-panel{padding:10px 5px}.phase3-card{width:52px;height:75px}.phase3-card.mini{width:43px;height:63px}.phase3-card.mini strong{font-size:1.1rem}.phase3-card.mini span{font-size:1rem}.phase3-close{padding:7px;font-size:.58rem}.phase3-actions button{padding:8px;font-size:.65rem}}
+/* FASE 4 — armi in arena, danni e serbatoi senza sovrascrivere la campagna */
+.phase4-health-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.phase4-health{border:1px solid #244c68;background:#091b2e;border-radius:10px;padding:10px;font-size:.75rem}
+.phase4-health span{display:block;margin-bottom:5px}.phase4-health small{display:block;font-size:.65rem;color:#b5d4e4;margin-top:6px;white-space:normal}
+.phase4-health-track{height:9px;background:#370f27;border-radius:999px;overflow:hidden}.phase4-health-track div{background:linear-gradient(90deg,#24a6af,#42ddb8);height:100%;transition:width .45s}
+.phase4-loadout{margin:10px 0;padding:9px;border:1px solid #375a87;border-radius:10px;font-size:.72rem;background:#0a1c30}
+.phase4-loadout-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}.phase4-loadout label{display:flex;flex-direction:column;gap:4px;font-size:.68rem;color:#bbebf8}
+.phase4-loadout select{width:100%;min-width:0;background:#0c2a46;color:#e5f9ff;border:1px solid #45718c;border-radius:7px;padding:7px;font-size:.68rem}
+.phase4-armed-slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.phase4-weapon-tile{display:flex;align-items:center;gap:8px;min-height:71px;padding:7px;border:1px solid;border-radius:9px;background:#061a2a;overflow:hidden}
+.phase4-weapon-tile img{width:43px;height:60px;object-fit:cover;border-radius:5px;flex-shrink:0}.phase4-weapon-icon{font-size:1.7rem}
+.phase4-weapon-tile>div{display:flex;flex-direction:column;min-width:0;gap:3px}.phase4-weapon-tile small{font-size:.61rem;color:#9dd7e8}.phase4-weapon-tile b{font-size:.73rem;line-height:1.2}.phase4-weapon-tile div span{font-size:.61rem;color:#c1d0ed;line-height:1.2}
+.phase4-weapon-choices{margin:8px 0;padding:9px;border:1px solid #1b607a;border-radius:10px;background:#061c2c}.phase4-weapon-choices>strong{display:block;color:#9fe8ff;font-size:.73rem;margin-bottom:8px}.phase4-weapon-choices>p{font-size:.72rem;color:#e6b4ba}
+.phase4-weapon-choices button{display:block;width:100%;text-align:left;padding:9px;margin:5px 0;border-radius:7px;color:#cbeaff;background:#0c2e47;border:1px solid #2b6885;font-size:.72rem}
+.phase4-weapon-choices button.phase4-picked{border-color:#e6cc79;background:#143c4e;box-shadow:inset 0 0 0 1px #d7c786}
+.phase4-volley-row{margin-top:7px;display:flex;justify-content:space-around;gap:6px;flex-wrap:wrap;font-size:.7rem;font-weight:normal}
+@media(max-width:540px){.phase4-loadout-controls{grid-template-columns:1fr}.phase4-armed-slots{grid-template-columns:1fr 1fr}.phase4-health-row{grid-template-columns:1fr}.phase4-weapon-tile img{width:35px;height:49px}}
+
+.phase4-firing-scene{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:5px;align-items:center;margin:10px 0;padding:13px 8px;background:radial-gradient(ellipse at center,#174563,#030d1e 70%);border:1px solid #3382a5;border-radius:12px;overflow:hidden}
+.phase4-combatant{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-width:0}.phase4-combatant span{color:#90daf5;font-size:.7rem;font-weight:900}.phase4-combatant b{font-size:.82rem}.phase4-combatant strong{font-size:.7rem;color:#ffe7ab}
+.phase4-crossfire{position:relative;min-height:65px;display:flex;align-items:center;justify-content:center}.phase4-crossfire span{position:absolute;height:3px;width:45px;box-shadow:0 0 15px #5cfbff;background:#8bebff;animation:phase4bolt .45s ease-in infinite alternate}.phase4-crossfire span:nth-child(2){background:#ff9b86;box-shadow:0 0 15px #ff8c7d;animation-direction:alternate-reverse}.phase4-crossfire i{position:relative;z-index:2;font-style:normal;font-size:1.5rem;animation:phase4flicker .2s infinite alternate}
+@keyframes phase4bolt{from{transform:translateX(-24px);opacity:.35}to{transform:translateX(24px);opacity:1}}@keyframes phase4flicker{to{filter:brightness(1.8);transform:scale(1.35)}}
+
+.phase4-boost-standby{opacity:.65;border-style:dashed!important}
+/* FASE 5 — boost calcolato con due carte effettive dalla mano */
+.phase5-boost-panel{margin:12px 0;padding:12px;border:1px solid #b78d36;border-radius:12px;background:linear-gradient(145deg,#292114,#0a1a2c)}
+.phase5-boost-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.phase5-boost-head>div{display:flex;flex-direction:column;gap:5px}.phase5-boost-head strong{color:#f6dc96;font-size:.82rem}.phase5-boost-head small{color:#c0d0df;font-size:.7rem}
+.phase5-boost-head button,.phase5-boost-footer button,.phase5-tiers button{padding:9px 11px;border:1px solid #947c40;border-radius:8px;background:#233348;color:#f8e5ad;font-size:.7rem;font-weight:800}
+.phase5-boost-head button.phase5-toggle-active,.phase5-tiers button.active{background:#70541d;color:#fff;border-color:#ffe094}
+.phase5-tiers{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.phase5-tiers button:disabled{opacity:.45}
+.phase5-calc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.phase5-calc-grid label{display:flex;flex-direction:column;gap:5px;color:#e4d6af;font-size:.7rem}
+.phase5-calc-grid select{min-width:0;max-width:100%;background:#09233a;color:#e7f7ff;border:1px solid #8c874b;border-radius:7px;padding:9px 4px;font-size:.72rem}
+.phase5-boost-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:.73rem}.phase5-valid{color:#89ffcf}.phase5-invalid{color:#ffccac}.phase5-hint{font-size:.69rem;line-height:1.5;color:#d0c6a6;margin:10px 0 0}
+@media(max-width:540px){.phase5-calc-grid{gap:4px}.phase5-calc-grid select{font-size:.64rem}.phase5-boost-head button{width:100%}}
+
+.phase5-boost-active{border-color:#d3a94b!important;background:linear-gradient(150deg,#282313,#091e30)}
+
+/* FASE 6 — il tempo perso appartiene solo al giocatore che cambia */
+.phase6-cost-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:8px 0;padding:9px;background:#0b2436;border:1px solid #347084;border-radius:9px;font-size:.67rem}
+.phase6-cost-guide>b,.phase6-cost-guide>em{grid-column:1/-1;color:#82e3ff}
+.phase6-cost-guide>span{padding:7px;background:#112f43;border-radius:6px;line-height:1.35}
+.phase6-cost-guide>span strong{display:block;color:#ffce87;margin-top:3px}
+.phase6-cost-guide>em{font-size:.65rem;color:#a9e5ff;font-style:normal}
+.phase6-last-action{padding:8px;color:#b2f4e1;background:#0b302a;border:1px solid #227c68;border-radius:8px;font-size:.67rem}
+@media(max-width:580px){.phase6-cost-guide{grid-template-columns:1fr}}
+
+.phase9-mode-banner{margin:8px 12px;padding:8px 10px;border:1px solid rgba(75,198,218,.48);border-radius:8px;color:#bceef8;background:rgba(7,36,52,.85);font-size:12px;font-weight:650;text-align:center}
+
+/* FASE 16C — cerimonia passiva Möbius, senza dipendenze grafiche esterne */
+@keyframes phase16c-orbit-pulse {0%,100%{transform:rotate(-6deg) scale(.95);filter:drop-shadow(0 0 10px #2fd7ff)}50%{transform:rotate(6deg) scale(1.10);filter:drop-shadow(0 0 30px #7ff6ff)}}
+@keyframes phase16c-cards-appear {0%{opacity:0;transform:translateY(-14px) rotate(-8deg)}60%{opacity:1;transform:translateY(5px) rotate(4deg)}100%{opacity:1;transform:translateY(0) rotate(0)}}
+.phase16c-mobius-symbol {animation:phase16c-orbit-pulse 2.2s ease-in-out infinite}
+.phase16c-mobius-cards .phase3-card {animation:phase16c-cards-appear .85s ease-out backwards}
+.phase16c-mobius-cards .phase3-card:nth-child(2){animation-delay:.12s}
+.phase16c-mobius-cards .phase3-card:nth-child(3){animation-delay:.24s}
+.phase16c-mobius-cards .phase3-card:nth-child(4){animation-delay:.36s}
+@media(prefers-reduced-motion:reduce){.phase16c-mobius-symbol,.phase16c-mobius-cards .phase3-card{animation:none}}

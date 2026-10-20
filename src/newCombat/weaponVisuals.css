@@ -1,0 +1,11 @@
+/* Stili di carta e catalogo, SENZA effetti di combattimento. */
+.phase8-card-art{object-fit:contain;object-position:center;display:block;max-width:100%;height:auto;border-radius:5px}
+.phase8-catalog-thumb{width:40px;height:65px;flex:0 0 40px;object-fit:contain}
+.phase8-catalog-item{display:flex;gap:6px;align-items:flex-start;min-height:83px}
+.phase8-catalog-text{min-width:0;overflow-wrap:anywhere}
+.phase8-equipped-thumb{width:48px;height:78px;margin:4px auto;object-fit:contain}
+.phase8-choice-thumb{width:34px;height:52px;object-fit:contain;flex:0 0 34px}
+.phase4-weapon-choices button{display:flex;align-items:center;gap:7px}
+/* Segnale discreto della carta arma attiva nel riepilogo tecnico. */
+.phase8-firing-origin{outline:1px solid #a8f4ff;outline-offset:2px;filter:drop-shadow(0 0 6px rgba(72,223,255,.4))}
+@media(max-width:500px){.phase8-equipped-thumb{width:39px;height:65px}}

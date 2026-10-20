@@ -1,0 +1,17 @@
+/* Nessuno stile della plancia. Questo foglio agisce solo sugli involucri estranei del motore Poker. */
+.phase3-backdrop{padding:0!important;overflow:hidden!important;}
+.phase3-panel.classic-poker-mode{position:absolute!important;inset:0!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
+.phase3-panel.classic-poker-mode>.phase3-header{display:none!important;}
+.phase3-panel.classic-poker-mode>.phase3-message{position:fixed;bottom:5%;left:50%;transform:translateX(-50%);z-index:150001;max-width:90vw;}
+.phase3-panel.classic-poker-mode>details.classic-poker-advanced{display:none;}
+.phase3-panel.classic-poker-mode>details.classic-poker-advanced[open]{display:block;position:fixed;inset:4% 3%;z-index:150000;overflow:auto;background:#071426;color:#e2f6ff;padding:20px;border:2px solid #00f2fe;border-radius:12px;box-shadow:0 0 0 100vmax rgba(0,0,0,.86);}
+
+.classic-online-poker-layout{position:fixed!important;inset:0!important;padding:0!important;overflow:hidden!important;min-height:0!important;}
+.classic-online-poker-layout>div:first-child{display:none!important;}
+.classic-online-poker-layout>p{position:fixed;left:0;right:0;bottom:0;z-index:99001;background:#041225;margin:0;max-height:38px;overflow:hidden;}
+
+/* FIX 2: turno IA solo osservazione, senza comandi cliccabili. */
+.poker-waiting-controls{width:100%;min-height:39px;display:flex;align-items:center;justify-content:center;text-align:center;letter-spacing:.055em;color:#9de9f9;font-family:Orbitron,sans-serif;font-size:.66rem;font-weight:850;text-shadow:0 0 9px rgba(26,205,243,.3);}
+.poker-ai-card-enter{animation:pokerAiCardEnter .42s cubic-bezier(.2,.8,.24,1.15) both;}
+@keyframes pokerAiCardEnter{0%{opacity:.15;transform:translateY(-24px) scale(.78);filter:brightness(1.4)}80%{opacity:1;transform:translateY(2px) scale(1.06);filter:brightness(1.15)}100%{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){.poker-ai-card-enter{animation:none}}
