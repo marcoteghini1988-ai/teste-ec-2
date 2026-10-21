@@ -1,110 +1,195 @@
-/* FIX 9 — PORTA DIMENSIONALE VERTICALE, ANCORATA ALLA SINGOLA CARTA ARMA.
-   Il piano è in coordinate viewport, mentre la carta è misurata con getBoundingClientRect().
-   Questo file gestisce SOLTANTO la grafica: il motore Poker resta proprietario dei danni. */
+/* FIX 10 — VARCO COSMICO RIFATTO.
+   Mantiene l'ancoraggio sopra la carta corretta, ma il look ora è quello di uno squarcio dimensionale:
+   nucleo profondo, bordo energetico frastagliato, scariche e vortice interno. */
 .es-poker-battle-vfx-layer{
   position:fixed;inset:0;z-index:999999;pointer-events:none;
   overflow:hidden;isolation:isolate;contain:layout style;
 }
 
-/* La base sta SOPRA la carta: non viene più traslata in un'altra riga della plancia. */
 .es-rift-gate{
+  --rift-outer:color-mix(in srgb,var(--rift-main) 82%,#8b5cf6 18%);
+  --rift-core:color-mix(in srgb,var(--rift-highlight) 68%,#ffffff 32%);
+  --rift-abyss:color-mix(in srgb,var(--rift-shadow) 78%,#030712 22%);
+  --rift-energy:color-mix(in srgb,var(--rift-main) 62%,#22d3ee 38%);
   position:absolute;box-sizing:border-box;
-  width:var(--rift-gate-width,74px);height:var(--rift-gate-height,140px);
+  width:var(--rift-gate-width,94px);height:var(--rift-gate-height,136px);
   transform:translate(-50%,-50%);transform-origin:center bottom;
-  perspective:650px;pointer-events:none;isolation:isolate;
-  filter:drop-shadow(0 0 9px var(--rift-main));
+  perspective:900px;pointer-events:none;isolation:isolate;
+  filter:drop-shadow(0 0 12px var(--rift-outer)) drop-shadow(0 0 28px color-mix(in srgb,var(--rift-main) 48%,transparent));
+}
+.es-rift-gate::before,.es-rift-gate::after{
+  content:"";position:absolute;inset:-8% -10%;pointer-events:none;opacity:.85;
+}
+.es-rift-gate::before{
+  background:
+    radial-gradient(circle at 50% 16%,color-mix(in srgb,var(--rift-core) 92%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 15% 42%,color-mix(in srgb,var(--rift-main) 94%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 82% 38%,color-mix(in srgb,var(--rift-highlight) 92%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 26% 76%,color-mix(in srgb,var(--rift-core) 94%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 74% 74%,color-mix(in srgb,var(--rift-main) 94%,transparent) 0 2px,transparent 3px);
+  filter:blur(.2px) drop-shadow(0 0 8px var(--rift-main));
+  animation:es-rift-star-flicker 1.05s ease-in-out infinite alternate;
+}
+.es-rift-gate::after{
+  clip-path:polygon(50% 0,59% 12%,70% 7%,73% 21%,87% 17%,81% 33%,98% 35%,84% 48%,96% 62%,78% 65%,82% 82%,66% 78%,60% 100%,50% 89%,40% 100%,34% 78%,18% 82%,22% 65%,4% 62%,16% 48%,2% 35%,19% 33%,13% 17%,27% 21%,30% 7%,41% 12%);
+  background:radial-gradient(circle at 50% 50%,transparent 44%,color-mix(in srgb,var(--rift-highlight) 92%,transparent) 52%,transparent 64%);
+  filter:blur(1.4px) drop-shadow(0 0 14px var(--rift-highlight));
+  animation:es-rift-crackle 1.2s ease-in-out infinite alternate;
 }
 .es-rift-door{
-  position:absolute;inset:0;transform-style:preserve-3d;
-  transform-origin:50% 100%;
-  animation:es-rift-door-open .54s cubic-bezier(.15,.75,.2,1) both;
+  position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 100%;
+  animation:es-rift-door-open .56s cubic-bezier(.15,.75,.2,1) both;
 }
 .es-rift-gate.enemy .es-rift-door{animation-name:es-rift-door-open-enemy}
-/* Profondità della soglia: un fondo scuro arretrato e due pareti visibili. */
 .es-rift-backplane,.es-rift-depth,.es-rift-mouth,.es-rift-halo,
 .es-rift-left-wall,.es-rift-right-wall,.es-rift-vertical-axis,
-.es-rift-sparks,.es-rift-orbit,.es-rift-boost-crown{
+.es-rift-sparks,.es-rift-orbit,.es-rift-boost-crown,
+.es-rift-rear-frame,.es-rift-depth-bridge,.es-rift-floor-shadow{
   position:absolute;display:block;box-sizing:border-box;pointer-events:none;
 }
+.es-rift-rear-frame{
+  inset:2% 5% 0; border-radius:43% 43% 46% 46% / 39% 39% 59% 59%;
+  background:radial-gradient(ellipse at 50% 55%,#01030a 8%,color-mix(in srgb,var(--rift-shadow) 84%,#020617 16%) 56%,transparent 72%);
+  border:2px solid color-mix(in srgb,var(--rift-highlight) 38%,transparent);
+  transform:translateZ(-42px) scale(.92);
+  box-shadow:0 0 20px color-mix(in srgb,var(--rift-main) 42%,transparent),inset 0 0 22px #000;
+  opacity:.9;
+}
+.es-rift-depth-bridge{
+  inset:7% 16% 8%; border-radius:50%;
+  background:radial-gradient(circle at 50% 54%,transparent 0 32%,color-mix(in srgb,var(--rift-main) 18%,transparent) 56%,transparent 74%);
+  transform:translateZ(-20px) scale(.94,.88);
+  opacity:.7; filter:blur(1px);
+}
 .es-rift-backplane{
-  inset:3% 10%;border-radius:46% 46% 42% 42% / 46% 46% 50% 50%;
-  background:radial-gradient(ellipse at 52% 50%,#01030b 0 28%,var(--rift-shadow) 61%,#000 100%);
-  box-shadow:0 0 18px 4px var(--rift-main),inset 0 0 20px #000;
-  transform:translateZ(-30px) scale(.86);
+  inset:12% 16% 10%; border-radius:50%;
+  background:radial-gradient(circle at 50% 55%,#01030c 0 18%,#05071a 28%,var(--rift-shadow) 62%,transparent 76%);
+  transform:translateZ(-24px) scale(.94,.88);
+  box-shadow:0 0 20px color-mix(in srgb,var(--rift-shadow) 44%,transparent), inset 0 0 25px #000;
 }
 .es-rift-depth{
-  inset:4% 10%;border-radius:49% 49% 44% 44% / 50% 50% 49% 49%;
-  border:7px solid color-mix(in srgb,var(--rift-main) 58%,#050611);
-  background:radial-gradient(ellipse at 43% 47%,#000 0 34%,var(--rift-shadow) 80%,#020412 100%);
-  box-shadow:inset 0 0 26px 8px #01020a,0 0 13px 2px var(--rift-main);
-  transform:translateZ(-15px);
+  inset:12% 13% 9%; border-radius:50%;
+  background:
+    radial-gradient(circle at 52% 52%,#01030b 0 16%,transparent 17%),
+    conic-gradient(from 0deg,
+      color-mix(in srgb,var(--rift-shadow) 60%,transparent) 0deg,
+      color-mix(in srgb,var(--rift-main) 58%,transparent) 58deg,
+      color-mix(in srgb,var(--rift-highlight) 52%,transparent) 120deg,
+      color-mix(in srgb,var(--rift-shadow) 76%,transparent) 188deg,
+      color-mix(in srgb,var(--rift-main) 54%,transparent) 260deg,
+      color-mix(in srgb,var(--rift-highlight) 46%,transparent) 320deg,
+      color-mix(in srgb,var(--rift-shadow) 60%,transparent) 360deg);
+  border:2px solid color-mix(in srgb,var(--rift-main) 38%,transparent);
+  transform:translateZ(-8px) scale(.98,.9);
+  mix-blend-mode:screen;filter:blur(.2px) saturate(1.18);
+  animation:es-rift-vortex-spin 2.6s linear infinite;
 }
 .es-rift-left-wall,.es-rift-right-wall{
-  top:7%;height:85%;width:13%;border-radius:50%;
-  background:linear-gradient(90deg,var(--rift-shadow),var(--rift-main),var(--rift-highlight));
-  box-shadow:0 0 12px 2px var(--rift-main),inset 0 0 9px #fff9;
-  transform-style:preserve-3d;
+  top:16%;bottom:16%;width:11%;border-radius:999px;
+  background:linear-gradient(180deg,transparent 0%,color-mix(in srgb,var(--rift-core) 65%,transparent) 10%,var(--rift-main) 48%,color-mix(in srgb,var(--rift-shadow) 88%,#020617 12%) 100%);
+  box-shadow:0 0 16px color-mix(in srgb,var(--rift-main) 68%,transparent),inset 0 0 8px color-mix(in srgb,var(--rift-highlight) 55%,transparent);
+  opacity:.9;
 }
-.es-rift-left-wall{left:2%;transform:translateZ(3px) rotateY(-54deg);}
-.es-rift-right-wall{right:2%;transform:translateZ(16px) rotateY(57deg);}
+.es-rift-left-wall{left:10%;transform:translateZ(6px) rotateY(-62deg)}
+.es-rift-right-wall{right:10%;transform:translateZ(18px) rotateY(62deg)}
 .es-rift-mouth{
-  inset:8% 17%;border-radius:49% 49% 45% 45% / 48% 48% 52% 52%;
-  background:radial-gradient(ellipse at 48% 51%,#00020b 0 30%,#071029 48%,var(--rift-shadow) 65%,transparent 87%);
-  box-shadow:inset 0 0 19px 3px #000,0 0 14px 3px var(--rift-main);
-  transform:translateZ(2px);
-  animation:es-rift-mouth-breathe .7s ease-in-out infinite alternate;
+  inset:7% 10% 5%;border-radius:46% 46% 50% 50% / 42% 42% 58% 58%;
+  background:
+    radial-gradient(circle at 50% 52%,#000 0 18%,color-mix(in srgb,var(--rift-shadow) 90%,#000 10%) 26%,transparent 34%),
+    radial-gradient(circle at 30% 28%,color-mix(in srgb,var(--rift-highlight) 90%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 68% 72%,color-mix(in srgb,var(--rift-core) 92%,transparent) 0 2px,transparent 4px),
+    radial-gradient(circle at 55% 38%,color-mix(in srgb,var(--rift-main) 85%,transparent) 0 1px,transparent 3px),
+    conic-gradient(from 0deg,
+      color-mix(in srgb,var(--rift-main) 10%,transparent) 0deg,
+      color-mix(in srgb,var(--rift-main) 52%,transparent) 54deg,
+      color-mix(in srgb,var(--rift-highlight) 48%,transparent) 112deg,
+      color-mix(in srgb,var(--rift-shadow) 50%,transparent) 180deg,
+      color-mix(in srgb,var(--rift-main) 56%,transparent) 247deg,
+      color-mix(in srgb,var(--rift-highlight) 44%,transparent) 305deg,
+      color-mix(in srgb,var(--rift-main) 10%,transparent) 360deg);
+  box-shadow:inset 0 0 28px #000,0 0 18px color-mix(in srgb,var(--rift-main) 55%,transparent),0 0 34px color-mix(in srgb,var(--rift-highlight) 24%,transparent);
+  transform:translateZ(12px) scale(1,.95);
+  overflow:hidden; animation:es-rift-mouth-breathe .8s ease-in-out infinite alternate;
 }
-/* Il bordo non è un anello orizzontale: è una PORTA alta, luminosa, con effetto vetro convesso. */
+.es-rift-mouth::before,.es-rift-mouth::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+}
+.es-rift-mouth::before{
+  background:
+    repeating-conic-gradient(from 0deg,transparent 0 16deg,color-mix(in srgb,var(--rift-highlight) 45%,transparent) 17deg 22deg,transparent 23deg 46deg),
+    radial-gradient(circle at 50% 50%,transparent 0 24%,color-mix(in srgb,var(--rift-main) 35%,transparent) 44%,transparent 68%);
+  mix-blend-mode:screen;opacity:.66;animation:es-rift-vortex-spin 2.1s linear infinite reverse;
+}
+.es-rift-mouth::after{
+  inset:18% 18%;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--rift-core) 88%,#fff 12%) 0 6%,transparent 10% 40%,color-mix(in srgb,var(--rift-shadow) 76%,transparent) 64%,transparent 78%);
+  filter:blur(.5px);opacity:.84;animation:es-rift-core-flare 1.05s ease-in-out infinite alternate;
+}
 .es-rift-halo{
-  inset:0 8%;border-radius:46% 46% 43% 43% / 49% 49% 51% 51%;
-  border:4px solid var(--rift-highlight);
-  background:conic-gradient(from 12deg,transparent 0 24deg,var(--rift-main) 40deg,transparent 100deg,var(--rift-highlight) 155deg,transparent 213deg,var(--rift-main) 285deg,transparent 347deg);
-  box-shadow:inset 0 0 10px 2px var(--rift-main),0 0 12px 3px var(--rift-main),0 0 25px 4px color-mix(in srgb,var(--rift-main) 40%,transparent);
-  transform:translateZ(23px);
-  animation:es-rift-halo-glow var(--rift-pulse,650ms) ease-in-out infinite alternate;
+  inset:1% 5%;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%,transparent 51%,color-mix(in srgb,var(--rift-highlight) 72%,transparent) 58%,transparent 66%),
+    conic-gradient(from 8deg,
+      transparent 0deg 20deg,
+      color-mix(in srgb,var(--rift-highlight) 88%,transparent) 28deg,
+      transparent 44deg 90deg,
+      color-mix(in srgb,var(--rift-main) 76%,transparent) 112deg,
+      transparent 138deg 182deg,
+      color-mix(in srgb,var(--rift-highlight) 80%,transparent) 214deg,
+      transparent 242deg 304deg,
+      color-mix(in srgb,var(--rift-main) 82%,transparent) 330deg,
+      transparent 360deg);
+  box-shadow:0 0 22px color-mix(in srgb,var(--rift-main) 52%,transparent),0 0 42px color-mix(in srgb,var(--rift-highlight) 24%,transparent),inset 0 0 10px color-mix(in srgb,var(--rift-highlight) 42%,transparent);
+  transform:translateZ(26px) scale(1.06,1.02);
+  filter:blur(.2px); animation:es-rift-halo-glow var(--rift-pulse,780ms) ease-in-out infinite alternate;
 }
 .es-rift-vertical-axis{
-  top:12%;bottom:12%;left:50%;width:3px;transform:translateX(-50%) translateZ(8px);
-  background:linear-gradient(180deg,transparent,var(--rift-main) 15%,#fff 49%,var(--rift-highlight) 75%,transparent);
-  opacity:.55;filter:blur(.5px);animation:es-rift-vertical-pulse .6s ease-in-out infinite alternate;
+  left:50%;top:14%;bottom:14%;width:18%;transform:translateX(-50%) translateZ(22px);
+  background:linear-gradient(180deg,transparent 0%,color-mix(in srgb,var(--rift-highlight) 16%,transparent) 10%,color-mix(in srgb,var(--rift-core) 90%,transparent) 48%,color-mix(in srgb,var(--rift-main) 45%,transparent) 72%,transparent 100%);
+  clip-path:polygon(50% 0,65% 12%,56% 28%,73% 40%,61% 51%,78% 66%,55% 79%,64% 100%,36% 100%,45% 80%,22% 66%,39% 52%,26% 39%,44% 27%,35% 11%);
+  opacity:.82;filter:blur(.3px) drop-shadow(0 0 10px var(--rift-highlight));
+  animation:es-rift-axis-pulse .65s ease-in-out infinite alternate;
 }
 .es-rift-sparks{
-  inset:12% 20%;border-radius:50%;transform:translateZ(12px);
-  background:repeating-linear-gradient(165deg,transparent 0 7px,var(--rift-highlight) 8px 9px,transparent 10px 16px);
-  opacity:.25;mix-blend-mode:screen;animation:es-rift-sparks-scroll 1.1s linear infinite;
+  inset:10% 12%;border-radius:50%;transform:translateZ(29px);
+  background:
+    radial-gradient(circle at 17% 32%,color-mix(in srgb,var(--rift-main) 90%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 79% 27%,color-mix(in srgb,var(--rift-highlight) 90%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 31% 76%,color-mix(in srgb,var(--rift-core) 90%,transparent) 0 2px,transparent 3px),
+    radial-gradient(circle at 68% 73%,color-mix(in srgb,var(--rift-main) 90%,transparent) 0 2px,transparent 3px),
+    repeating-conic-gradient(from 0deg,transparent 0 28deg,color-mix(in srgb,var(--rift-highlight) 38%,transparent) 30deg 34deg,transparent 36deg 62deg);
+  opacity:.6;mix-blend-mode:screen;animation:es-rift-sparks-scroll 1.18s linear infinite;
 }
 .es-rift-orbit{
-  inset:9% 19%;border:1px solid var(--rift-highlight);border-radius:50%;opacity:.56;
-  box-shadow:0 0 9px var(--rift-main);transform:translateZ(28px) rotateY(55deg);
-  animation:es-rift-orbit-glow .75s ease-in-out infinite alternate;
+  inset:8% 12%;border:2px solid color-mix(in srgb,var(--rift-highlight) 84%,transparent);
+  border-radius:50%;transform:translateZ(32px) rotate(11deg);
+  opacity:.55;box-shadow:0 0 12px color-mix(in srgb,var(--rift-main) 62%,transparent),inset 0 0 9px color-mix(in srgb,var(--rift-highlight) 35%,transparent);
+  animation:es-rift-orbit-glow .78s ease-in-out infinite alternate;
 }
-.es-rift-orbit-two{inset:12% 14%;transform:translateZ(33px) rotateY(-55deg);animation-delay:.2s}
-/* Un ombra corta appoggiata alla TESTA della carta, non la fenditura orizzontale precedente. */
+.es-rift-orbit-one{transform:translateZ(32px) rotate(24deg) scale(1.04,.78)}
+.es-rift-orbit-two{inset:16% 20%;transform:translateZ(38px) rotate(-38deg) scale(1.14,.9);animation-delay:.2s}
 .es-rift-floor-shadow{
-  position:absolute;bottom:-4%;left:23%;right:23%;height:9%;border-radius:50%;
-  background:radial-gradient(ellipse,var(--rift-main) 0,transparent 75%);
-  opacity:.5;filter:blur(6px);transform:rotateX(75deg);
+  left:22%;right:22%;bottom:-2%;height:14%;border-radius:50%;
+  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--rift-main) 58%,transparent) 0%,transparent 72%);
+  opacity:.56;filter:blur(10px);transform:rotateX(78deg);
 }
 .es-rift-card-tether{
   position:absolute;z-index:1;width:3px;transform:translateX(-50%);pointer-events:none;
-  background:linear-gradient(to bottom,var(--rift-main),var(--rift-highlight));
-  box-shadow:0 0 8px 2px var(--rift-main);animation:es-rift-tether-in .3s ease-out both;
+  background:linear-gradient(to bottom,color-mix(in srgb,var(--rift-highlight) 10%,transparent),var(--rift-main),var(--rift-highlight));
+  box-shadow:0 0 9px 2px var(--rift-main);animation:es-rift-tether-in .3s ease-out both;
 }
-/* Selettore presente soltanto sul vero slot dell'arma che sta sparando. */
 [data-player-weapon-slot].es-rift-source-active,[data-enemy-weapon-slot].es-rift-source-active{
   outline:2px solid #dffbff!important;outline-offset:2px;
-  filter:drop-shadow(0 0 9px #36dcff) brightness(1.17);
+  filter:drop-shadow(0 0 10px #36dcff) brightness(1.18);
 }
 .es-rift-caption{
   position:absolute;transform:translate(-50%,-50%);max-width:178px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 7px;
-  border:1px solid var(--rift-main);border-radius:6px;
-  background:rgba(3,9,25,.91);color:#f1fbff;font-size:9px;
+  border:1px solid color-mix(in srgb,var(--rift-main) 85%,transparent);border-radius:7px;
+  background:rgba(3,9,25,.92);color:#f1fbff;font-size:9px;
   font-weight:800;text-shadow:0 0 6px var(--rift-main);
-  box-shadow:0 0 12px color-mix(in srgb,var(--rift-main) 38%,transparent);
+  box-shadow:0 0 14px color-mix(in srgb,var(--rift-main) 42%,transparent);
   animation:es-rift-caption-in .3s ease-out both;
 }
-/* Le tracce escono dal CENTRO della porta e colpiscono solo l'HUD bersaglio. */
 .es-rift-projectile{
   position:absolute;width:calc(var(--shot-size,12px) * 3.4);
   height:var(--shot-size,12px);border-radius:999px;
@@ -122,79 +207,210 @@
 .es-rift-impact{position:absolute;width:36px;height:36px;border:3px solid var(--rift-main);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 21px 9px var(--rift-main),inset 0 0 15px var(--rift-highlight);animation:es-rift-hit .36s ease-out forwards}
 .es-rift-impact::after{content:"";position:absolute;inset:8px;border:2px solid #fff;border-radius:50%}
 .es-rift-hp-impact{animation:es-rift-hp-hit .22s ease-in-out!important}
-/* Famiglie e firme individuali presenti nel catalogo */
-.es-rift-arc .es-rift-vertical-axis{width:12px;left:44%;clip-path:polygon(15% 0,80% 21%,18% 47%,85% 68%,20% 100%,0 94%,60% 67%,0 44%,60% 20%,0 5%)}
-.es-rift-pulse .es-rift-orbit{border-width:3px;animation-duration:.38s}
-.es-rift-gate.es-rift-orbit .es-rift-orbit{border-style:dashed}
-.es-rift-plasma .es-rift-mouth{filter:brightness(1.4) saturate(1.6)}
-.es-rift-shard .es-rift-halo{clip-path:polygon(50% 0,100% 29%,93% 78%,50% 100%,7% 80%,0 30%);border-radius:12px}
-.es-rift-beam .es-rift-vertical-axis{width:6px;left:47%}
-.es-rift-spear .es-rift-orbit{border-radius:35%;transform:translateZ(25px) rotateY(35deg)}
+
+/* Varianti per famiglia: base comune ma identità visiva diversa. */
+.es-rift-arc{--rift-outer:color-mix(in srgb,var(--rift-main) 55%,#60a5fa 45%)}
+.es-rift-arc .es-rift-halo{background:radial-gradient(circle at 50% 50%,transparent 53%,color-mix(in srgb,#c4b5fd 72%,transparent) 58%,transparent 66%),repeating-conic-gradient(from 8deg,transparent 0 18deg,color-mix(in srgb,#c4b5fd 80%,transparent) 19deg 24deg,transparent 26deg 44deg,color-mix(in srgb,#60a5fa 72%,transparent) 45deg 48deg,transparent 50deg 360deg)}
+.es-rift-arc .es-rift-vertical-axis{width:24%;clip-path:polygon(48% 0,61% 12%,54% 24%,68% 38%,56% 48%,74% 63%,55% 76%,62% 100%,38% 100%,44% 78%,27% 63%,42% 49%,30% 37%,46% 23%,40% 12%)}
+.es-rift-beam .es-rift-halo{inset:3% 12%;transform:translateZ(26px) scale(1.02,1.08)}
+.es-rift-beam .es-rift-orbit{inset:14% 22%;border-style:solid;opacity:.4}
+.es-rift-pulse .es-rift-orbit{border-width:4px;opacity:.68;animation-duration:.42s}
+.es-rift-pulse .es-rift-orbit-two{inset:21% 25%;transform:translateZ(37px) scale(1.32,1.32)}
+.es-rift-orbit .es-rift-depth,.es-rift-orbit .es-rift-mouth::before{animation-duration:1.7s}
+.es-rift-orbit .es-rift-halo{box-shadow:0 0 24px color-mix(in srgb,var(--rift-main) 54%,transparent),0 0 54px color-mix(in srgb,var(--rift-highlight) 38%,transparent),inset 0 0 14px color-mix(in srgb,var(--rift-highlight) 48%,transparent)}
+.es-rift-plasma{--rift-outer:color-mix(in srgb,var(--rift-main) 58%,#fb7185 42%)}
+.es-rift-plasma .es-rift-mouth{filter:brightness(1.18) saturate(1.38)}
+.es-rift-plasma .es-rift-halo{background:radial-gradient(circle at 50% 50%,transparent 51%,color-mix(in srgb,#fda4af 72%,transparent) 58%,transparent 66%),conic-gradient(from 0deg,transparent 0deg 18deg,color-mix(in srgb,#fb7185 88%,transparent) 28deg,transparent 44deg 98deg,color-mix(in srgb,#fb923c 82%,transparent) 114deg,transparent 138deg 198deg,color-mix(in srgb,#facc15 75%,transparent) 214deg,transparent 236deg 298deg,color-mix(in srgb,#fb7185 84%,transparent) 326deg,transparent 360deg)}
+.es-rift-shard .es-rift-halo{clip-path:polygon(50% 0,72% 8%,100% 28%,91% 53%,99% 79%,76% 100%,50% 91%,24% 100%,1% 79%,9% 53%,0 28%,28% 8%);border-radius:0}
+.es-rift-shard .es-rift-mouth{border-radius:20% 20% 28% 28% / 16% 16% 40% 40%}
+.es-rift-spear .es-rift-mouth,.es-rift-spear .es-rift-halo{border-radius:38% 38% 50% 50% / 24% 24% 68% 68%}
+.es-rift-spear .es-rift-orbit{transform:translateZ(30px) rotate(12deg) scale(.78,1.1)}
 .es-rift-motif-0 .es-rift-orbit-two{border-style:dotted;border-width:2px}
-.es-rift-motif-1 .es-rift-halo{border-style:dashed}
-.es-rift-motif-2 .es-rift-sparks{background-size:14px 22px;animation-duration:.55s}
-.es-rift-motif-3 .es-rift-orbit-one{border-width:3px;box-shadow:0 0 14px var(--rift-highlight)}
-.es-rift-gate.es-rift-boosted{filter:drop-shadow(0 0 14px #facc15) drop-shadow(0 0 21px #f97316)}
-.es-rift-boost-crown{inset:-8%;border:4px dashed #facc15;border-radius:48% / 51%;transform:translateZ(38px);box-shadow:0 0 20px #fbbf24,inset 0 0 16px #fff2;animation:es-rift-boost-spin 1.1s linear infinite}
+.es-rift-motif-1 .es-rift-halo{filter:blur(.35px) brightness(1.1)}
+.es-rift-motif-2 .es-rift-sparks{animation-duration:.7s}
+.es-rift-motif-3 .es-rift-orbit-one{box-shadow:0 0 15px var(--rift-highlight),inset 0 0 10px color-mix(in srgb,var(--rift-highlight) 44%,transparent)}
+.es-rift-gate.es-rift-boosted{filter:drop-shadow(0 0 18px #facc15) drop-shadow(0 0 30px #f97316)}
+.es-rift-boost-crown{inset:-4%;border:3px dashed #facc15;border-radius:50%;transform:translateZ(42px);box-shadow:0 0 20px #fbbf24,inset 0 0 16px #fff2;animation:es-rift-boost-spin 1.1s linear infinite}
 .es-rift-shot-boost{filter:drop-shadow(0 0 12px #fde047) drop-shadow(0 0 10px #f97316);border:2px solid #facc15}
 .es-rift-boost-impact{border:5px solid #facc15;box-shadow:0 0 30px 12px #f97316,inset 0 0 22px #fff}
+
 @keyframes es-rift-door-open{
-  0%{opacity:0;transform:translateZ(-35px) rotateY(-79deg) scaleX(.10) scaleY(.65)}
-  65%{opacity:1;transform:translateZ(0) rotateY(-13deg) scaleX(1.04) scaleY(1.02)}
-  100%{opacity:1;transform:translateZ(0) rotateY(-17deg) scale(1)}
+  0%{opacity:0;transform:translateZ(-38px) rotateY(-76deg) scale(.48,.62)}
+  65%{opacity:1;transform:translateZ(8px) rotateY(-14deg) scale(1.08,1.04)}
+  100%{opacity:1;transform:translateZ(0) rotateY(-18deg) scale(1)}
 }
 @keyframes es-rift-door-open-enemy{
-  0%{opacity:0;transform:translateZ(-35px) rotateY(79deg) scaleX(.10) scaleY(.65)}
-  65%{opacity:1;transform:translateZ(0) rotateY(13deg) scaleX(1.04) scaleY(1.02)}
-  100%{opacity:1;transform:translateZ(0) rotateY(17deg) scale(1)}
+  0%{opacity:0;transform:translateZ(-38px) rotateY(76deg) scale(.48,.62)}
+  65%{opacity:1;transform:translateZ(8px) rotateY(14deg) scale(1.08,1.04)}
+  100%{opacity:1;transform:translateZ(0) rotateY(18deg) scale(1)}
 }
-@keyframes es-rift-mouth-breathe{to{filter:brightness(1.5);opacity:.82}}
-@keyframes es-rift-halo-glow{to{filter:brightness(1.65);box-shadow:0 0 20px 5px var(--rift-main),inset 0 0 15px 2px var(--rift-highlight)}}
-@keyframes es-rift-vertical-pulse{to{opacity:.18;transform:translateX(-50%) translateZ(8px) scaleX(.7)}}
-@keyframes es-rift-sparks-scroll{to{background-position:45px 0}}
-@keyframes es-rift-orbit-glow{to{opacity:.3;filter:brightness(1.6)}}
+@keyframes es-rift-mouth-breathe{from{transform:translateZ(12px) scale(1,.92)}to{transform:translateZ(12px) scale(1.03,1)}}
+@keyframes es-rift-halo-glow{to{filter:brightness(1.32);box-shadow:0 0 26px color-mix(in srgb,var(--rift-main) 62%,transparent),0 0 54px color-mix(in srgb,var(--rift-highlight) 34%,transparent),inset 0 0 16px color-mix(in srgb,var(--rift-highlight) 48%,transparent)}}
+@keyframes es-rift-axis-pulse{to{opacity:.36;transform:translateX(-50%) translateZ(24px) scaleY(1.08)}}
+@keyframes es-rift-sparks-scroll{to{transform:translateZ(29px) rotate(360deg)}}
+@keyframes es-rift-orbit-glow{to{opacity:.25;transform:translateZ(34px) rotate(16deg) scale(1.08,.82)}}
+@keyframes es-rift-vortex-spin{to{transform:translateZ(-8px) scale(.98,.9) rotate(360deg)}}
+@keyframes es-rift-core-flare{to{transform:scale(1.22);opacity:.98;filter:blur(.7px)}}
+@keyframes es-rift-crackle{to{transform:scale(1.05) rotate(5deg);opacity:1;filter:blur(1px) drop-shadow(0 0 18px var(--rift-highlight))}}
+@keyframes es-rift-star-flicker{to{opacity:.42;transform:scale(1.03)}}
 @keyframes es-rift-tether-in{from{opacity:0;scale:1 .15}to{opacity:1;scale:1 1}}
 @keyframes es-rift-caption-in{from{opacity:0;transform:translate(-50%,-25%) scale(.8)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes es-rift-hit{from{opacity:1;scale:.28}to{opacity:0;scale:2.15}}
 @keyframes es-rift-hp-hit{0%,100%{filter:none}50%{filter:brightness(2.8) drop-shadow(0 0 12px #fff)}}
-@keyframes es-rift-boost-spin{to{transform:translateZ(38px) rotate(360deg)}}
-@media(max-width:650px){.es-rift-caption{max-width:126px;font-size:8px}.es-rift-shot-beam{width:60px}.es-rift-weapon-label{max-width:88px;font-size:7px}}
+@keyframes es-rift-boost-spin{to{transform:translateZ(42px) rotate(360deg)}}
+@media(max-width:650px){.es-rift-caption{max-width:126px;font-size:8px}.es-rift-shot-beam{width:60px}.es-rift-gate{width:calc(var(--rift-gate-width,94px) * .85);height:calc(var(--rift-gate-height,136px) * .85)}}
 @media(prefers-reduced-motion:reduce){
-  .es-rift-door,.es-rift-door *,.es-rift-caption,.es-rift-impact{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .es-rift-door,.es-rift-door *,.es-rift-caption,.es-rift-impact,.es-rift-gate::before,.es-rift-gate::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
 
-/* FIX 9: contorno da PORTA, con colonne in profondità e ombra breve alla base.
-   Queste regole sono usate dal componente che Classic importa veramente. */
-.es-rift-gate{min-height:68px;aspect-ratio:auto;}
-.es-rift-gate .es-rift-door{transform-style:preserve-3d;}
-.es-rift-gate .es-rift-left-wall,.es-rift-gate .es-rift-right-wall{
-  border:1px solid color-mix(in srgb,var(--rift-highlight) 65%,transparent);
-  filter:drop-shadow(0 0 6px var(--rift-main));
+/* R3 — PROIETTILI DELLE 48 CARTE ARMA.
+   La geometria del colpo NON deriva dalla famiglia del varco.
+   Corpo, punta e scia sono entità distinte. Nessun cambiamento ai danni. */
+.es-rift-projectile{
+  box-sizing:border-box;width:var(--shot-length,45px);height:var(--shot-size,18px);
+  background:transparent;box-shadow:none;border:0;border-radius:0;
+  clip-path:none;filter:drop-shadow(0 0 6px var(--shot-core,#baf3ff));
 }
-.es-rift-gate .es-rift-floor-shadow{bottom:-3%;height:12%;}
-.es-rift-gate .es-rift-halo{border-width:4px;}
-.es-rift-gate .es-rift-backplane{filter:brightness(.55);}
+.es-rift-projectile::after{display:none}
+.es-rift-projectile .es-shot-core,
+.es-rift-projectile .es-shot-tail{position:absolute;box-sizing:border-box;display:block;pointer-events:none}
+.es-rift-projectile .es-shot-core{
+  right:2%;top:16%;width:55%;height:68%;border-radius:55% 75% 75% 55%;
+  background:linear-gradient(180deg,var(--shot-edge,#fff),var(--shot-core,#69dbff) 50%,#041228);
+  box-shadow:0 0 8px var(--shot-core,#69dbff);z-index:2;
+}
+.es-rift-projectile .es-shot-tail{
+  left:0;top:35%;width:62%;height:30%;border-radius:80%;
+  background:linear-gradient(90deg,transparent,var(--shot-core,#69dbff),var(--shot-edge,#fff));
+  filter:blur(2px);opacity:.88;z-index:1;
+}
+.es-rift-projectile .es-shot-core::before,.es-rift-projectile .es-shot-core::after{
+  content:"";position:absolute;pointer-events:none;
+}
+/* Dardi, aghi, lance, traccianti */
+.es-weapon-shot-kinetic .es-shot-core{height:40%;top:30%;width:49%;border-radius:35% 95% 95% 35%;background:linear-gradient(180deg,#f1ffff,var(--shot-core),#334155)}
+.es-weapon-shot-needle .es-shot-core,.es-weapon-shot-tachyon .es-shot-core{
+  top:43%;height:14%;width:77%;background:var(--shot-edge);clip-path:polygon(0 45%,87% 12%,100% 50%,87% 88%,0 55%);box-shadow:none;
+}
+.es-weapon-shot-needle .es-shot-tail,.es-weapon-shot-tachyon .es-shot-tail{height:10%;top:45%;width:63%}
+.es-weapon-shot-tachyon .es-shot-core::before{left:22%;top:-180%;height:440%;width:12%;background:var(--shot-core);transform:skewX(30deg);box-shadow:0 0 12px var(--shot-core)}
+.es-weapon-shot-sniper .es-shot-core,.es-weapon-shot-filament .es-shot-core{
+  top:44%;height:12%;width:92%;background:linear-gradient(90deg,transparent,var(--shot-core),#fff);border-radius:1px;
+}
+.es-weapon-shot-filament .es-shot-core{height:7%;top:46%;box-shadow:0 0 7px var(--shot-core)}
+.es-weapon-shot-lance .es-shot-core,.es-weapon-shot-harpoon .es-shot-core{
+  top:25%;height:50%;width:84%;clip-path:polygon(0 44%,62% 44%,62% 6%,100% 50%,62% 94%,62% 56%,0 56%);border-radius:0;
+}
+.es-weapon-shot-harpoon .es-shot-core::before{right:12%;top:0;width:20%;height:100%;border:2px solid var(--shot-edge);transform:skewX(-20deg)}
+.es-weapon-shot-quill .es-shot-core{width:80%;height:70%;top:15%;clip-path:polygon(0 85%,36% 15%,96% 0,100% 28%,25% 75%);border-radius:0}
+.es-weapon-shot-quill .es-shot-core::after{left:13%;top:53%;width:75%;height:2px;background:#fff;transform:rotate(-21deg)}
+/* Lame, falci, trivelle, gelo */
+.es-weapon-shot-crescent .es-shot-core{width:64%;height:100%;top:0;right:5%;border-radius:50%;border-right:calc(var(--shot-size) * .25) solid var(--shot-edge);border-top:2px solid var(--shot-core);border-bottom:2px solid var(--shot-core);background:transparent;box-shadow:5px 0 8px var(--shot-core)}
+.es-weapon-shot-blades .es-shot-core,.es-weapon-shot-lightblade .es-shot-core{
+  top:15%;height:70%;width:89%;clip-path:polygon(0 32%,73% 38%,97% 0,100% 50%,97% 100%,73% 62%,0 68%);border-radius:0;
+}
+.es-weapon-shot-blades .es-shot-core::before{left:15%;top:-22%;width:80%;height:24%;background:var(--shot-edge);transform:skewX(28deg)}
+.es-weapon-shot-ice .es-shot-core{width:77%;height:100%;top:0;clip-path:polygon(0 40%,23% 6%,47% 30%,66% 0,100% 51%,62% 100%,44% 66%,14% 84%);border-radius:0;background:linear-gradient(140deg,#fff,var(--shot-core),#3e74ad)}
+.es-weapon-shot-drill .es-shot-core{width:80%;height:84%;top:8%;clip-path:polygon(0 13%,68% 29%,100% 50%,68% 71%,0 87%);border-radius:0;background:repeating-linear-gradient(115deg,var(--shot-edge) 0 3px,var(--shot-core) 5px 11px,#18213f 13px 17px)}
+.es-weapon-shot-serpent .es-shot-core{width:90%;height:100%;top:0;border-radius:0;clip-path:polygon(0 45%,18% 12%,37% 64%,53% 19%,77% 73%,91% 30%,100% 46%,91% 85%,72% 100%,52% 54%,36% 94%,16% 52%)}
+/* Armi a raggi e armi multi-emettitore */
+.es-weapon-shot-prism .es-shot-core{width:91%;top:35%;height:30%;border-radius:0;background:linear-gradient(180deg,#a5f3fc,#fff,#f472b6,#facc15,#2dd4bf);box-shadow:0 0 13px var(--shot-core)}
+.es-weapon-shot-twinbeam .es-shot-core,.es-weapon-shot-triple .es-shot-core{width:92%;top:16%;height:22%;border-radius:2px;background:linear-gradient(90deg,transparent,var(--shot-core),var(--shot-edge));box-shadow:0 0 9px var(--shot-core)}
+.es-weapon-shot-twinbeam .es-shot-core::after,.es-weapon-shot-triple .es-shot-core::after{content:"";top:195%;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--shot-edge),var(--shot-core));box-shadow:0 0 8px var(--shot-edge)}
+.es-weapon-shot-triple .es-shot-core::before{content:"";top:390%;left:8%;width:92%;height:90%;background:var(--shot-core);box-shadow:0 0 7px var(--shot-core)}
+.es-weapon-shot-lightning .es-shot-core{width:96%;height:95%;top:2%;right:2%;clip-path:polygon(0 52%,23% 8%,39% 62%,55% 1%,71% 54%,100% 20%,87% 98%,67% 82%,52% 100%,36% 80%,20% 94%);border-radius:0;background:var(--shot-edge);filter:drop-shadow(0 0 5px var(--shot-core))}
+.es-weapon-shot-lightning .es-shot-tail{opacity:.3}
+.es-weapon-shot-ring .es-shot-core,.es-weapon-shot-wave .es-shot-core{width:calc(var(--shot-size) * 1.1);height:100%;top:0;right:0;border:3px solid var(--shot-edge);border-radius:50%;background:transparent;box-shadow:0 0 12px 4px var(--shot-core),inset 0 0 9px var(--shot-core)}
+.es-weapon-shot-wave .es-shot-core{border-right:5px solid var(--shot-edge);border-left:0;box-shadow:6px 0 12px var(--shot-core)}
+.es-weapon-shot-wave .es-shot-core::before{left:-50%;top:12%;width:100%;height:75%;border-right:2px solid var(--shot-edge);border-radius:50%;opacity:.7}
+/* Munizioni fisiche: missile ben distinguibile dall'orbe energetico */
+.es-weapon-shot-shell .es-shot-core,.es-weapon-shot-missile .es-shot-core{
+  width:76%;height:52%;top:24%;right:0;border-radius:28% 80% 80% 28%;background:linear-gradient(180deg,var(--shot-edge) 0 10%,var(--shot-core) 45%,#25334d 90%);
+}
+.es-weapon-shot-shell .es-shot-core::after{right:-1%;top:15%;width:18%;height:70%;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%)}
+.es-weapon-shot-missile .es-shot-core{height:40%;top:30%;border-radius:9% 80% 80% 9%}
+.es-weapon-shot-missile .es-shot-core::before{
+  left:12%;top:-53%;width:35%;height:205%;background:var(--shot-core);clip-path:polygon(0 0,100% 44%,100% 56%,0 100%,15% 50%);opacity:.95;
+}
+.es-weapon-shot-missile .es-shot-core::after{right:-1%;top:0;width:22%;height:100%;background:var(--shot-edge);clip-path:polygon(0 0,100% 50%,0 100%)}
+.es-weapon-shot-missile .es-shot-tail{background:linear-gradient(90deg,transparent,#f97316 24%,#fef08a 65%,#fff);height:44%;top:28%;filter:blur(1px)}
+.es-weapon-shot-harpoon .es-shot-tail,.es-weapon-shot-shell .es-shot-tail{opacity:.4}
+.es-weapon-shot-drone .es-shot-core{width:74%;height:70%;top:15%;clip-path:polygon(2% 50%,23% 13%,68% 13%,100% 50%,68% 87%,23% 87%);border-radius:0}
+.es-weapon-shot-drone .es-shot-core::before{left:15%;top:-28%;width:66%;height:155%;border-top:3px solid var(--shot-edge);border-bottom:3px solid var(--shot-edge);transform:skewX(-18deg)}
+.es-weapon-shot-drone .es-shot-core::after{right:12%;top:35%;width:12%;height:30%;border-radius:50%;background:#fff}
+/* Nuclei sferici, materia cosmica */
+.es-weapon-shot-gravity .es-shot-core,.es-weapon-shot-magnetic .es-shot-core,.es-weapon-shot-star .es-shot-core,
+.es-weapon-shot-void .es-shot-core,.es-weapon-shot-solar .es-shot-core,.es-weapon-shot-antimatter .es-shot-core,
+.es-weapon-shot-astral .es-shot-core,.es-weapon-shot-plasma .es-shot-core,.es-weapon-shot-singularity .es-shot-core,
+.es-weapon-shot-supernova .es-shot-core{
+  width:var(--shot-size);height:var(--shot-size);top:0;right:0;border-radius:50%;
+  background:radial-gradient(circle at 36% 33%,#fff 0 7%,var(--shot-edge) 21%,var(--shot-core) 56%,#06112a 91%);
+  box-shadow:0 0 13px 3px var(--shot-core);
+}
+.es-weapon-shot-gravity .es-shot-core::after,.es-weapon-shot-magnetic .es-shot-core::after,.es-weapon-shot-astral .es-shot-core::after{
+  inset:-20%;border:2px dashed var(--shot-edge);border-radius:50%;transform:rotate(-24deg) scaleX(1.25);
+}
+.es-weapon-shot-void .es-shot-core,.es-weapon-shot-antimatter .es-shot-core,.es-weapon-shot-singularity .es-shot-core{
+  background:radial-gradient(circle at 45% 48%,#01010b 0 48%,var(--shot-core) 58%,var(--shot-edge) 70%,transparent 85%);
+}
+.es-weapon-shot-singularity .es-shot-core::after,.es-weapon-shot-void .es-shot-core::after{inset:-10%;border:3px solid var(--shot-edge);border-radius:50%;transform:skewX(28deg)}
+.es-weapon-shot-star .es-shot-core,.es-weapon-shot-solar .es-shot-core,.es-weapon-shot-supernova .es-shot-core{
+  clip-path:polygon(50% 0,60% 30%,84% 15%,72% 42%,100% 50%,72% 58%,84% 85%,60% 70%,50% 100%,40% 70%,16% 85%,28% 58%,0 50%,28% 42%,16% 15%,40% 30%);
+}
+.es-weapon-shot-supernova .es-shot-core{box-shadow:0 0 22px 10px var(--shot-core)}
+.es-weapon-shot-plasma .es-shot-core{border-radius:56% 44% 63% 37%;filter:blur(.7px)}
+.es-weapon-shot-flame .es-shot-core{width:78%;height:100%;top:0;border-radius:0;clip-path:polygon(0 65%,20% 20%,37% 50%,54% 0,74% 35%,100% 49%,78% 90%,42% 100%);background:radial-gradient(circle,var(--shot-edge),var(--shot-core),transparent)}
+/* Proiettili astrali e forme speciali con simboli identificabili */
+.es-weapon-shot-paradox .es-shot-core,.es-weapon-shot-compass .es-shot-core{width:var(--shot-size);height:100%;right:2%;top:0;border-radius:0;clip-path:polygon(50% 0,63% 40%,100% 50%,63% 60%,50% 100%,38% 60%,0 50%,38% 40%)}
+.es-weapon-shot-compass .es-shot-core::before{top:25%;left:25%;width:50%;height:50%;border:2px solid #fff;border-radius:50%}
+.es-weapon-shot-ghost .es-shot-core{width:75%;height:85%;top:8%;background:linear-gradient(90deg,transparent,var(--shot-core),#fff9);border-radius:50%;opacity:.58;filter:blur(3px)}
+.es-weapon-shot-chrono .es-shot-core{width:var(--shot-size);height:100%;right:0;top:0;border:3px solid var(--shot-edge);border-radius:50%;background:repeating-conic-gradient(var(--shot-core) 0deg 13deg,transparent 14deg 45deg)}
+.es-weapon-shot-chrono .es-shot-core::before{width:3px;height:40%;left:48%;top:15%;background:#fff;transform-origin:bottom;transform:rotate(35deg)}
+.es-weapon-shot-eclipse .es-shot-core{width:var(--shot-size);height:100%;top:0;right:0;border:4px solid var(--shot-edge);border-radius:50%;background:radial-gradient(circle,#05050a 0 52%,var(--shot-core) 58%,#fff 70%)}
+.es-weapon-shot-rune .es-shot-core,.es-weapon-shot-sigil .es-shot-core{width:var(--shot-size);height:100%;top:0;right:0;border:4px solid var(--shot-edge);border-radius:14%;transform:rotate(45deg);background:radial-gradient(circle,transparent 0 35%,var(--shot-core) 39% 45%,transparent 49%)}
+.es-weapon-shot-sigil .es-shot-core{clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);transform:none;border:0;background:conic-gradient(var(--shot-core),transparent,var(--shot-edge),var(--shot-core))}
+.es-weapon-shot-twinpulse .es-shot-core{width:38%;height:48%;top:4%;border-radius:50%;background:var(--shot-core)}
+.es-weapon-shot-twinpulse .es-shot-core::after{width:100%;height:100%;top:110%;left:-50%;border-radius:50%;background:var(--shot-edge);box-shadow:0 0 10px var(--shot-edge)}
+.es-weapon-shot-portalshot .es-shot-core{width:var(--shot-size);height:100%;top:0;right:0;border:3px solid var(--shot-edge);border-radius:30%;background:radial-gradient(ellipse at center,#07041e,var(--shot-core),#0b0322)}
+.es-weapon-shot-portalshot .es-shot-core::after{inset:15%;border:2px solid var(--shot-core);border-radius:30%;background:radial-gradient(circle,#fff 0 8%,transparent 25%)}
+/* Il Boost continua a usare l'oro ma non trasforma missili, aghi o lame in un tipo generico. */
+.es-rift-projectile.es-rift-shot-boost{border:0;filter:drop-shadow(0 0 12px #facc15) drop-shadow(0 0 8px var(--shot-core))}
 
-/* Due superfici arretrate, separate dalla facciata luminosa: effetto di TUNNEL 3D. */
-.es-rift-rear-frame,.es-rift-depth-bridge{
- position:absolute;box-sizing:border-box;pointer-events:none;
- border-radius:48% 48% 45% 45% / 46% 46% 52% 52%;
- transform-origin:center bottom;
+
+/* R6 — Immagini cosmiche generate, diverse per famiglia e con trasparenza reale.
+   Manteniamo la porta 3D precedente come volume di supporto: il disegno vero
+   appare in primo piano e non può essere coperto dall'ovale CSS. */
+.es-rift-gate .es-rift-door{overflow:visible;isolation:isolate;}
+.es-rift-gate .es-rift-door .es-rift-art{
+  position:absolute;display:block;pointer-events:none;
+  left:-27%;top:-13%;width:154%;height:132%;max-width:none;
+  opacity:1;z-index:12;border-radius:34px;
+  transform:translateZ(58px) scaleX(.89);
+  transform-origin:50% 54%;
+  background-repeat:no-repeat;
+  background-size:200% 300%;
+  background-position:0% 0%;
+  filter:drop-shadow(0 0 9px var(--rift-main)) drop-shadow(0 0 18px var(--rift-shadow));
+  animation:es-rift-sheet-play 900ms steps(1,end) 1 both, es-rift-art-throb 1.18s ease-in-out infinite alternate;
+  will-change:transform,filter,background-position;
 }
-.es-rift-rear-frame{
- inset:4% 12% 2% 5%;border:7px solid var(--rift-main);
- transform:translate(11px,-9px) rotateY(-25deg) scale(.93);
- background:radial-gradient(ellipse at 52% 49%,#02040b 16%,var(--rift-shadow) 56%,#02040a 91%);
- box-shadow:8px -7px 17px var(--rift-main),inset 0 0 23px #000;
- opacity:.8;filter:brightness(.65);z-index:0;
+/* Gli elementi CSS mantengono il volume, ma senza soffocare l'immagine. */
+.es-rift-gate .es-rift-door .es-rift-halo{opacity:.24;}
+.es-rift-gate .es-rift-door .es-rift-sparks{opacity:.38;}
+.es-rift-gate .es-rift-door .es-rift-vertical-axis{opacity:.12;}
+.es-rift-gate .es-rift-door .es-rift-orbit{opacity:.25;}
+.es-rift-gate .es-rift-door .es-rift-boost-crown{z-index:16;}
+.es-rift-gate.es-rift-boosted .es-rift-art{filter:drop-shadow(0 0 14px #facc15) drop-shadow(0 0 16px var(--rift-main));}
+@keyframes es-rift-sheet-play{
+  0%, 14% {background-position:0% 0%;}
+  16%, 30% {background-position:100% 0%;}
+  32%, 46% {background-position:0% 50%;}
+  48%, 62% {background-position:100% 50%;}
+  64%, 78% {background-position:0% 100%;}
+  80%, 100% {background-position:100% 100%;}
 }
-.es-rift-depth-bridge{
- inset:5% 8% 1% 9%;border-left:12px solid var(--rift-shadow);
- border-right:10px solid var(--rift-main);
- transform:translate(5px,-4px) rotateY(-16deg);
- box-shadow:inset -9px 0 15px #02030b,5px 0 14px var(--rift-main);
- opacity:.75;z-index:1;
+@keyframes es-rift-art-throb{
+  from{transform:translateZ(58px) scaleX(.83) scaleY(.96);filter:drop-shadow(0 0 7px var(--rift-main));}
+  to{transform:translateZ(58px) scaleX(.9) scaleY(1.03);filter:drop-shadow(0 0 13px var(--rift-main)) drop-shadow(0 0 19px var(--rift-shadow));}
 }
-.es-rift-gate.enemy .es-rift-rear-frame{transform:translate(-11px,-9px) rotateY(25deg) scale(.93);}
-.es-rift-gate.enemy .es-rift-depth-bridge{transform:translate(-5px,-4px) rotateY(16deg);}
-.es-rift-gate .es-rift-door{z-index:2;}
+@media(prefers-reduced-motion:reduce){.es-rift-gate .es-rift-door .es-rift-art{animation:none}}

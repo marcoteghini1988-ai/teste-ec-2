@@ -16,6 +16,28 @@ const RIFT_PALETTES = {
   plasma: ['#ff84ac', '#fff0c6', '#76234b'],
   spear:  ['#8fe5ff', '#e2fbff', '#185da0'],
 };
+// R6: UNA sola tabella per le immagini dei varchi. Il colpo resta definito dall'ID arma,
+// in pokerVolleyVfx.js, e NON dipende dalla scelta di questa immagine.
+const PORTAL_SHEETS=Object.freeze({
+  burst:'/assets/portal_sequences/burst.png',
+  beam:'/assets/portal_sequences/pulse.png',
+  arc:'/assets/portal_sequences/arc.png',
+  shard:'/assets/portal_sequences/shard.png',
+  pulse:'/assets/portal_sequences/pulse.png',
+  orbit:'/assets/portal_sequences/orbit.png',
+  plasma:'/assets/portal_sequences/plasma.png',
+  spear:'/assets/portal_sequences/shard.png',
+  toxic:'/assets/portal_sequences/toxic.png',
+});
+const portalSheetFor=(signature,weapon)=>{
+  const text=`${weapon?.name||''} ${signature?.effectName||''}`.toLowerCase();
+  if(/tossic|corros|velen|acido|spora|nebbia|poison|toxic/.test(text))return PORTAL_SHEETS.toxic;
+  return PORTAL_SHEETS[signature?.family]||PORTAL_SHEETS.orbit;
+};
+// R7 — sequenze sprite 2x3, una per famiglia. Il colpo resta separato e definito dalla carta arma.
+if(typeof window!=='undefined' && typeof Image!=='undefined'){
+  Object.values(PORTAL_SHEETS).forEach(src=>{const preload=new Image();preload.src=src;});
+}
 const point=(element)=>{
   const rect=element.getBoundingClientRect();
   return {x:rect.left+rect.width/2,y:rect.top+rect.height/2};
@@ -45,7 +67,7 @@ const setPalette=(node,signature)=>{
  * Appare solamente durante la fase 'animate' del Poker in ClassicBattleView.
  * Un varco VERTICALE si apre SOPRA la carta arma esatta,
  * il colpo attraversa il tavolo e raggiunge l'HUD HP avversario.
- * Nessuna immagine PNG o modello 3D necessario.
+ * Immagini WEBP trasparenti + animazione CSS; colpi sempre specifici delle 48 carte.
  */
 export default function PokerCombatEffects({volleys,opener='player',weapons=[],enemyWeapons=[]}) {
   const layerRef=useRef(null);
@@ -64,7 +86,7 @@ export default function PokerCombatEffects({volleys,opener='player',weapons=[],e
     const fire=(side,volley,order)=>{
       const weapon=getWeaponDefinition(volley.weaponId);
       const signature=pokerVolleyProfile(weapon);
-      if(!weapon||!signature||!volley.shots)return;
+      if(!weapon||!signature?.projectile||!volley.shots)return;
       const isEnemy=side==='enemy';
       // Associazione IDENTITARIA: lato, ID arma e indice fisico dello slot.
       // Mai cercare un'altra carta con lo stesso nome o un container della fila.
@@ -87,7 +109,7 @@ export default function PokerCombatEffects({volleys,opener='player',weapons=[],e
       }
       const begin=110+order*1130;
       const shots=Math.min(12,Math.max(1,Math.round(volley.shots)));
-      const interval=Math.min(signature.interval,Math.floor(900/shots));
+      const interval=Math.min(signature.projectile.intervalMs,Math.floor(900/shots));
       // Coordinate lette DALLA CARTA effettiva al momento della comparsa,
       // dopo le animazioni di posizionamento delle carte (non quando monta React).
       let aperture=null;
@@ -129,6 +151,7 @@ export default function PokerCombatEffects({volleys,opener='player',weapons=[],e
         portal.setAttribute('data-rift-side',side);
         portal.setAttribute('data-rift-slot-index',String(slot.dataset.weaponSlotIndex));
         portal.setAttribute('data-rift-effect-id',signature.effectId);
+        portal.setAttribute('data-rift-projectile',signature.projectile.shape);
         // La porta ha un volume proprio: architrave, fiancate, fondo, cuore
         // e bordo sono piani distinti con translateZ / rotateY, non un'ellisse piatta.
         element('span','es-rift-rear-frame',portal);
@@ -145,6 +168,13 @@ export default function PokerCombatEffects({volleys,opener='player',weapons=[],e
         element('span','es-rift-sparks',door);
         element('span','es-rift-orbit es-rift-orbit-one',door);
         element('span','es-rift-orbit es-rift-orbit-two',door);
+        // Il varco realistico resta SOPRA la carta e davanti agli strati CSS 3D.
+        // Non influisce sul tipo di proiettile calcolato dalla scheda arma.
+        const portalArt=element('span','es-rift-art',door);
+        const portalSheet=portalSheetFor(signature,weapon);
+        portalArt.style.backgroundImage=`url("${portalSheet}")`;
+        portalArt.setAttribute('aria-hidden','true');
+        portal.dataset.portalImage=portalSheet;
         if(volley.boostApplied){element('span','es-rift-boost-crown',door);}
         portal.style.setProperty('--rift-gate-lifetime','2220ms');
         // Piede del varco -> testa della STESSA carta, sempre sul medesimo asse X.
@@ -157,8 +187,8 @@ export default function PokerCombatEffects({volleys,opener='player',weapons=[],e
         const captionY=Math.max(13,Math.min(window.innerHeight-16,aperture.y-aperture.height/2-13));
         place(caption,{x:aperture.x,y:captionY});
         caption.textContent=volley.boostApplied
-          ? `⚡ BOOST ATTIVO · ${weapon.name} · +${volley.boostDamage||0} danni (${volley.boostPercent||0}%)`
-          : `${weapon.name} · ${signature.effectName} · ${volley.shots} colpi`;
+          ? `⚡ BOOST · ${weapon.name} · ${signature.projectile.label} · +${volley.boostDamage||0} danni (${volley.boostPercent||0}%)`
+          : `${weapon.name} · ${signature.projectile.label} · ${volley.shots} colpi`;
         setPalette(caption,signature);
         removeLater(caption,2050);
         trackPortal();
@@ -174,23 +204,34 @@ export default function PokerCombatEffects({volleys,opener='player',weapons=[],e
         const dx=finish.x-aperture.x;
         const dy=finish.y-aperture.y;
         const angle=Math.atan2(dy,dx)*180/Math.PI;
-        const spread=signature.spread;
-        // Piccole differenze di traiettoria, legate alla singola carta.
-        const deviation=(i%2?1:-1)*(spread+signature.projectileCurve);
-        const shot=element('div',`es-rift-projectile es-rift-shot-${signature.family} ${volley.boostApplied?'es-rift-shot-boost':''}`,layer);
+        // Il tipo fisico di colpo deve essere disponibile PRIMA di leggere shape/size.
+        // In R3 l'ordine inverso lanciava ReferenceError ed impediva ogni proiettile personalizzato.
+        const projectile=signature.projectile;
+        // Traiettoria propria del COLPO della carta arma, non della famiglia del varco.
+        const guided=['missile','drone','serpent','compass','astral','paradox'].includes(projectile.shape);
+        const deviation=guided?(i%2?1:-1)*Math.max(10,projectile.size*.8):0;
+        const shot=element('div',`es-rift-projectile es-weapon-shot-${projectile.shape} es-weapon-variant-${projectile.variant} ${volley.boostApplied?'es-rift-shot-boost':''}`,layer);
         place(shot,aperture);
         setPalette(shot,signature);
         shot.dataset.weaponId=weapon.id;
         shot.dataset.effectId=signature.effectId;
-        shot.style.setProperty('--shot-size',`${signature.size}px`);
+        shot.dataset.projectileShape=projectile.shape;
+        shot.dataset.projectileName=projectile.label;
+        shot.style.setProperty('--shot-size',`${projectile.size}px`);
+        shot.style.setProperty('--shot-length',`${projectile.length}px`);
+        shot.style.setProperty('--shot-core',projectile.primary);
+        shot.style.setProperty('--shot-edge',projectile.highlight);
+        // Corpo e scia separati: proiettili fisici diversi, porta invariata.
+        element('span','es-shot-tail',shot);
+        element('span','es-shot-core',shot);
         const start=`translate3d(-50%,-50%,0) rotate(${angle}deg) scale(.42)`;
-        const middle=`translate3d(calc(-50% + ${dx*.47+(signature.family==='arc'||signature.family==='orbit'?deviation:0)}px), calc(-50% + ${dy*.47+(signature.family==='shard'?deviation:0)}px), 0) rotate(${angle+signature.tilt*.35}deg) scale(1.1)`;
+        const middle=`translate3d(calc(-50% + ${dx*.47+(guided?deviation:0)}px), calc(-50% + ${dy*.47+(guided?deviation*.55:0)}px), 0) rotate(${angle}deg) scale(1.1)`;
         const end=`translate3d(calc(-50% + ${dx}px), calc(-50% + ${dy}px), 0) rotate(${angle}deg) scale(.58)`;
         const flight=shot.animate([
           {transform:start,opacity:.3},
           {transform:middle,opacity:1,offset:.47},
           {transform:end,opacity:.95},
-        ],{duration:signature.travelMs+110,easing:'ease-in',fill:'forwards'});
+        ],{duration:projectile.travelMs,easing:'ease-in',fill:'forwards'});
         animations.push(flight);
         flight.onfinish=()=>{
           shot.remove();
