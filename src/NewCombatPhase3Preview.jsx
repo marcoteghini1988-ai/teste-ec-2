@@ -347,7 +347,7 @@ export default function NewCombatPhase3Preview({ onClose, playerHand, playerDeck
         mode={pveMode?'PVE · POKER':pvpBotMode?'PVP · PILOTA IA':fixedLoadout?'SFIDA DEL GIORNO':campaignMode?'CAMPAGNA · POKER':'DUELLO POKER'}
         phase={game.phase} round={game.round} seconds={seconds} enemySeconds={enemySeconds} actor={game.actor} readyEnemy={Boolean(game.ready.enemy)}
         hp={game.phase===TURN_PHASES.ANIMATE && hpBeforeVolley ? hpBeforeVolley : game.hp} initialHp={game.initialHp} ammo={game.ammo}
-        playerEther={game.player.ether||0} playerMalus={game.phase16B?.player?.malusCharge||0}
+        boostTarget={target} boostEnergy={energy} boostEnabled={boostEnabled && boostValid} playerEther={game.player.ether||0} playerMalus={game.phase16B?.player?.malusCharge||0}
         enemyMalus={game.phase16B?.enemy?.malusCharge||0} playerModule={game.phase16F?.player}
         enemyModule={game.phase16F?.enemy} playerDice={game.phase16B?.player}
         enemyDice={game.phase16B?.enemy} goldenCard={game.player.hand.find(card=>card?.isGolden)}

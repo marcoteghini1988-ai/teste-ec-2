@@ -2328,6 +2328,51 @@ export default function ClassicBattleView({
   const [selectedHardpointIndex, setSelectedHardpointIndex] = useState(0);
   const [cardsPlayedThisTurn, setCardsPlayedThisTurn] = useState(0);
 
+  // Posiziona i pannelli giocatore dietro la mano: bordo inferiore a meta' carta.
+  // Misura in coordinate schermo e converte in coordinate locali della plancia scalata.
+  const enemyWeaponPanelsRef = useRef(null);
+  const playerWeaponPanelsRef = useRef(null);
+  const playerHandRackRef = useRef(null);
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      const panels = playerWeaponPanelsRef.current;
+      const hand = playerHandRackRef.current;
+      const enemy = enemyWeaponPanelsRef.current;
+      if (!panels || !hand || !enemy) return;
+      const card = hand.querySelector('.card-unit-station');
+      if (!card) return;
+      // Misura la posizione originale, evitando di sommare traslazioni successive.
+      panels.style.transform = 'none';
+      const panelRect = panels.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const viewport = panels.closest('.battle-viewport-classic');
+      const viewportRect = viewport?.getBoundingClientRect();
+      const screenScale = viewport && viewportRect && viewport.offsetWidth
+        ? viewportRect.width / viewport.offsetWidth : 1;
+      // R9.9: leggermente piu in alto: il bordo inferiore copre il primo quarto della mano.
+      const targetBottom = cardRect.top + cardRect.height * 0.25;
+      const offset = (targetBottom - panelRect.bottom) / (screenScale || 1);
+      panels.style.transform = `translateY(${Math.round(offset)}px)`;
+      // I due blocchi mantengono il posizionamento flex della riga nemica:
+      // niente trasformazioni individuali che possono annullarsi o disallinearli.
+    };
+    const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(update); };
+    schedule();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null;
+    if (observer && playerHandRackRef.current) observer.observe(playerHandRackRef.current);
+    window.addEventListener('resize', schedule);
+    // La mano puo' comparire dopo la distribuzione iniziale delle carte.
+    const handObserver = typeof MutationObserver !== 'undefined'
+      ? new MutationObserver(schedule) : null;
+    if (handObserver && playerHandRackRef.current) handObserver.observe(playerHandRackRef.current, { childList: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect(); handObserver?.disconnect();
+      window.removeEventListener('resize', schedule);
+    };
+  }, []);
+
   const cardsPlayedThisTurnRef = useRef(0);
   const [selectedHandToReplaceIdx, setSelectedHandToReplaceIdx] = useState(null);
 
@@ -3693,7 +3738,7 @@ export default function ClassicBattleView({
           }}>
 
             {/* FILA 1: ARMI AVVERSARIO CON CORNICE STILE FELTRO TAVOLO DA POKER */}
-            <div style={{
+            <div ref={enemyWeaponPanelsRef} style={{
               display: 'flex',
               justifyContent: 'space-between',
               width: 'calc(100% + 40px)',
@@ -4004,15 +4049,17 @@ export default function ClassicBattleView({
 
 
                                     {/* FILA 3: ARMI GIOCATORE CON CORNICE STILE FELTRO TAVOLO DA POKER */}
-            <div style={{
+            <div ref={playerWeaponPanelsRef} style={{
               display: 'flex',
               justifyContent: 'space-between',
+              // Solo traslazione verticale: bordo inferiore allineato a meta' mano giocatore.
               width: 'calc(100% + 40px)',
-              margin: '0 -20px 0 -20px',
+              margin: '0 -20px',
               position: 'relative',
               top: '4px',
-              zIndex: 60,
-              transform: 'translateZ(60px)',
+              zIndex: 10,
+              transformOrigin: 'center top',
+              transform: 'none',
               boxSizing: 'border-box',
               pointerEvents: 'auto'
             }}>
@@ -4192,61 +4239,26 @@ export default function ClassicBattleView({
                   width: '100%',
                   zIndex: 40
                 }}>
-                  {resolvedWeapons.slice(2, 4).map((wp, subIdx) => {
-                    const isReadyToFire = pokerMode ? Boolean(pokerBridge.weaponOptions?.some(o=>o.weaponId===wp.id)) : Boolean(weaponTriggersMap[wp.id]);
+                  {pokerMode ? (
+                    <>
+                      <div style={{ width: '44px', height: '17px' }} aria-hidden="true" />
+                      <div title={`BOOST: raggiungi ${pokerBridge.boostTarget ?? 6} usando due carte. Energia ${pokerBridge.boostEnergy ?? 0}/45.`}
+                        onClick={(e) => { e.stopPropagation(); pokerBridge.onOpenSystems?.(); }}
+                        style={{width:'44px',textAlign:'center',padding:'2px 0',borderRadius:'4px',fontSize:'0.55rem',fontWeight:900,fontFamily:'Orbitron, sans-serif',lineHeight:1.1,
+                          color:pokerBridge.boostEnabled?'#fff':(pokerBridge.boostEnergy>=15?'#bbf7d0':pokerBridge.boostEnergy>0?'#fde68a':'#94a3b8'),
+                          background:pokerBridge.boostEnabled?'#047857':(pokerBridge.boostEnergy>=15?'#14532d':pokerBridge.boostEnergy>0?'#713f12':'#1e293b'),
+                          border:`1.5px solid ${pokerBridge.boostEnabled?'#6ee7b7':pokerBridge.boostEnergy>=15?'#22c55e':pokerBridge.boostEnergy>0?'#f59e0b':'#64748b'}`,
+                          cursor:'pointer',pointerEvents:'auto'}}>
+                        {pokerBridge.boostTarget ?? 6}
+                        <span style={{display:'block',fontSize:'0.38rem',lineHeight:1.2}}>{pokerBridge.boostEnabled?'ATTIVO':pokerBridge.boostEnergy>=15?'PRONTO':`${pokerBridge.boostEnergy ?? 0}/15`}</span>
+                      </div>
+                    </>
+                  ) : resolvedWeapons.slice(2, 4).map((wp, subIdx) => {
+                    const isReadyToFire = Boolean(weaponTriggersMap[wp.id]);
                     const isArmed = Boolean(visibleBestTrigger?.weapons?.some(w => w.id === wp.id));
                     const curOp = wp.mathOp || (subIdx === 0 ? '+' : '*');
-                    const curTarget = wp.target;
                     const opDisplay = curOp === '*' ? '×' : (curOp === '/' ? '÷' : curOp);
-                    const isBomb = Boolean(wp.isBomb);
-
-                                        const handleSelectThisBadge = (e) => {
-                      if (e) e.stopPropagation();
-                      if (pokerMode) { if(wp.weaponClass && pokerBridge.canPlay)pokerBridge.onSelectWeapon?.(wp.id);else pokerBridge.onOpenSystems?.();return; }
-                      if (isReadyToFire) {
-                        try { playSound('select'); } catch (_) {}
-                        setManuallySelectedWeaponId(wp.id);
-                      }
-                    };
-
-                    return (
-                      <div
-                        key={`calc_badge_${wp.id || subIdx}`}
-                        onClick={handleSelectThisBadge}
-
-                        style={{
-                          width: '44px',
-                          textAlign: 'center',
-                          padding: '2px 0',
-                          borderRadius: '4px',
-                          fontSize: '0.52rem',
-                          fontFamily: 'Orbitron, sans-serif',
-                          fontWeight: 900,
-                          lineHeight: 1.1,
-                          cursor: isReadyToFire ? 'pointer' : 'default',
-                          pointerEvents: 'auto',
-                          background: isArmed
-                            ? 'linear-gradient(180deg, #10b981 0%, #064e3b 100%)'
-                            : (isReadyToFire ? 'linear-gradient(180deg, #ca8a04 0%, #713f12 100%)' : (isBomb ? 'linear-gradient(180deg, #ef4444 0%, #7f1d1d 100%)' : 'rgba(15, 23, 42, 0.95)')),
-                          border: isArmed
-                            ? '2px solid #ffffff'
-                            : (isReadyToFire ? '2px solid #facc15' : (isBomb ? '1.5px solid #f87171' : '1.5px solid rgba(0, 242, 254, 0.5)')),
-                          color: isArmed ? '#ffffff' : (isReadyToFire ? '#fef08a' : (isBomb ? '#fef08a' : '#00f2fe')),
-                          boxShadow: isArmed
-                            ? '0 0 14px #10b981, 0 0 6px #ffffff'
-                            : (isReadyToFire ? '0 0 10px #facc15' : (isBomb ? '0 0 10px #ef4444' : '0 2px 6px rgba(0,0,0,0.8)')),
-                          transform: isArmed ? 'scale(1.08)' : 'none',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        {pokerMode ? (wp.weaponClass ? wp.weaponClass.toUpperCase().slice(0,3) : 'BOOST') : (isBomb ? `💥${opDisplay}${curTarget}` : `${opDisplay}${curTarget}`)}
-                        {isBomb && wp.turnsRemaining !== undefined && (
-                          <span style={{ display: 'block', fontSize: '0.40rem', color: '#fca5a5' }}>
-                            {wp.turnsRemaining}T
-                          </span>
-                        )}
-                      </div>
-                    );
+                    return <div key={`calc_badge_${wp.id || subIdx}`} style={{width:'44px',textAlign:'center',fontSize:'0.52rem',fontWeight:900,color:isArmed?'#fff':isReadyToFire?'#fef08a':'#00f2fe',background:'rgba(15,23,42,.95)',border:'1px solid #00f2fe',borderRadius:'4px'}}>{`${opDisplay}${wp.target}`}</div>;
                   })}
                 </div>
 
@@ -4391,7 +4403,7 @@ export default function ClassicBattleView({
         </div>
 
                                 {/* 4. MANO DEL GIOCATORE */}
-        <div className="player-cards-section" style={{ top: '-20px', pointerEvents: 'none' }}>
+        <div className="player-cards-section" style={{ top: '-20px', pointerEvents: 'none', zIndex: 80 }}> 
 
 
 
@@ -4405,7 +4417,7 @@ export default function ClassicBattleView({
           )}
 
 
-                              <div className="wall-hand-rack player-side">
+                              <div ref={playerHandRackRef} className="wall-hand-rack player-side">
             {(playerHand || []).map((card, idx) => {
               const isPlacedOnTable = tableSlots.some(s => s && s === card);
               const isExchangeSelected = isExchangeMode && selectedExchangeIndices?.includes(idx);

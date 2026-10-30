@@ -15,7 +15,7 @@ export default function ClassicPokerFieldBridge({
   arsenal={player:{},enemy:{}},weaponLevels={},selectedWeaponId=null,weaponOptions=[],
   playerSide='player',onSelectWeapon,onCardClick,onSlotClick,onPlaceCard,onAttack,onPass,onClear,onSwap,onReady,onFinish,onAbandon,
   canAttack=false,canPlay=false,canPrepare=false,ready=false,exchangesLeft=0,comboLabel='',result=null,finished=false,
-  onOpenSystems,systemsAvailable=false,playerEther=0,enemyMalus=0,playerMalus=0,
+  onOpenSystems,systemsAvailable=false,playerEther=0,boostTarget=6,boostEnergy=0,boostEnabled=false,enemyMalus=0,playerMalus=0,
   playerModule=null,enemyModule=null,playerDice=null,enemyDice=null, goldenCard=null,
   frozenClasses=[],volley=null,volleyOpener='player',aiPreviewSlots=[],aiStatus='ANALIZZA IL BANCO'
 }) {
@@ -64,7 +64,7 @@ export default function ClassicPokerFieldBridge({
     onCardClick,onSlotClick,onPlaceCard,onAttack,onPass,onClear,onSwap,onReady,onFinish,onAbandon,
     onSelectWeapon,onOpenSystems:allowedSystems,
     exchangesLeft,comboLabel,round,phase,mode,systemsAvailable,
-    result,volley,volleyOpener,actor,aiPreviewSlots,aiStatus,
+    result,volley,volleyOpener,actor,aiPreviewSlots,aiStatus,boostTarget,boostEnergy,boostEnabled,
   };
   return <ClassicBattleView
     pokerBridge={bridge}
