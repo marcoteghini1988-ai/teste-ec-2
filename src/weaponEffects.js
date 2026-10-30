@@ -1,3 +1,4 @@
+import { fireUniqueWeaponVFX } from './uniqueWeaponVFX';
 // ============================================================================
 // WEAPON COMBAT EFFECTS ENGINE (VFX BALISTICI & INTERAZIONE CON LA BARRA HP)
 // ============================================================================
@@ -744,6 +745,7 @@ function executeHeavyCannon({ level = 1, targetX, targetY, startX, startY, onCom
 // DISPATCHER PRINCIPALE DEI COLPI (BIDIREZIONALE SIMMETRICO)
 // ============================================================================
 export function fireWeaponCombatVFX(weapon, level = 1, { currentHp, maxHp, damage, onComplete, isEnemyAttacking = false }) {
+  if (fireUniqueWeaponVFX(weapon, level, { onComplete, isEnemyAttacking })) return;
   const targetDockId = isEnemyAttacking ? 'classicPlayerHpDock' : 'classicEnemyHpDock';
   const { layer, targetHpDock } = getCombatElements(targetDockId);
 
