@@ -201,7 +201,15 @@ export default function NewCombatPhase3Preview({ onClose, playerHand, playerDeck
   const boostValid=energy>=boostCost && selectedBoostCards.every(Boolean) &&
     checkBoostCalculation(selectedBoostCards[0],selectedBoostCards[1],boostOperation,target) && isPhase13BoostAllowed(game,{operation:boostOperation});
   const currentTier=BOOST_LEVELS.find(level=>level.cost===boostCost);
-  const canAttack = myTurn && draft.length && filledOriginal>=required && Boolean(chosenWeapon?.canFire) && (!boostEnabled || boostValid);
+  // La conferma dipende dagli slot vuoti effettivamente da riempire, non da 4
+  // carte obbligatorie a ogni turno. I piazzamenti extra sono facoltativi.
+  const boardPlacementCheck = useMemo(() => draft.length
+    ? applyBoardPlacements(game.board, draft, {
+        availableCardIds: game.player.hand.map(card => card.id),
+        blockedSlots: sealedSlots,
+      })
+    : { valid: false }, [game.board, game.player.hand, draft, sealedSlots]);
+  const canAttack = Boolean(myTurn && boardPlacementCheck.valid && chosenWeapon?.canFire && (!boostEnabled || boostValid));
   // Un orologio per fase, senza ripartire dopo i cambi. Le penalità riducono
   // soltanto il tempo personale; il conteggio dell'altro resta invariato.
   useEffect(() => {
